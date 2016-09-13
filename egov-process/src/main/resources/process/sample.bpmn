@@ -1,32 +1,22 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:modeler="http://activiti.com/modeler" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.activiti.org/processdef" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" expressionLanguage="http://www.w3.org/1999/XPath" id="m1473324508158" name="" targetNamespace="http://www.activiti.org/processdef" typeLanguage="http://www.w3.org/2001/XMLSchema">
-  <process id="sample" isClosed="false" isExecutable="true" name="sample" processType="None">
-    <documentation id="sample_D_1"><![CDATA[sample]]></documentation>
-    <startEvent id="startEvent1"/>
-    <endEvent id="sid-F1B5CB0B-1DA4-4D98-9109-ACA25EA58261"/>
-    <sequenceFlow id="sid-657950B7-8693-4E30-B8B9-F05D7281E5C2" sourceRef="startEvent1" targetRef="sid-F1B5CB0B-1DA4-4D98-9109-ACA25EA58261"/>
-  </process>
-  <bpmndi:BPMNDiagram documentation="background=#FFFFFF;count=1;horizontalcount=1;orientation=0;width=842.4;height=1195.2;imageableWidth=832.4;imageableHeight=1185.2;imageableX=5.0;imageableY=5.0" id="Diagram-_1" name="New Diagram">
-    <bpmndi:BPMNPlane bpmnElement="sample">
-      <bpmndi:BPMNShape bpmnElement="startEvent1" id="Shape-startEvent1">
-        <omgdc:Bounds height="32.0" width="32.0" x="100.0" y="163.0"/>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-F1B5CB0B-1DA4-4D98-9109-ACA25EA58261" id="Shape-sid-F1B5CB0B-1DA4-4D98-9109-ACA25EA58261">
-        <omgdc:Bounds height="32.0" width="32.0" x="330.0" y="164.0"/>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="32.0" width="32.0" x="0.0" y="0.0"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="sid-657950B7-8693-4E30-B8B9-F05D7281E5C2" id="BPMNEdge_sid-657950B7-8693-4E30-B8B9-F05D7281E5C2" sourceElement="startEvent1" targetElement="sid-F1B5CB0B-1DA4-4D98-9109-ACA25EA58261">
-        <omgdi:waypoint x="132.0" y="179.0"/>
-        <omgdi:waypoint x="330.0" y="180.0"/>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="-1.0" width="-1.0" x="-1.0" y="-1.0"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<definitions id="definitions"
+xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+targetNamespace="http://www.activiti.org/bpmn2.0">
+ 
+  <process id="helloWorld">
+ 
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="script" />
+    <scriptTask id="script" name="HelloWorld" scriptFormat="groovy">
+      <script>
+        System.out.println("Hello world")
+      </script>
+    </scriptTask>
+    <sequenceFlow id="flow2" sourceRef="script" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+ 
+</process>
+ 
 </definitions>
+

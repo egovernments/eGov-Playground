@@ -1,6 +1,8 @@
 package org.egov.process.config;
 
+import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
@@ -10,6 +12,7 @@ import org.activiti.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsync
 import org.activiti.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.egov.process.config.multitenant.ProcessEngineThreadLocal;
 import org.egov.process.config.multitenant.TenantIdentityHolder;
 import org.egov.process.config.multitenant.TenantawareDatasource;
 import org.springframework.beans.factory.annotation.Autowire;
@@ -42,8 +45,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP;
+import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE;
@@ -141,15 +146,16 @@ public class ApplicationConfig {
         processEngineConfig.setDataSource(tenantawareDatasource);
         processEngineConfig.setTransactionsExternallyManaged(true);
         processEngineConfig.setAsyncExecutorActivate(true);
+        processEngineConfig.setAsyncExecutorEnabled(true);
         processEngineConfig.setAsyncExecutor(new SharedExecutorServiceAsyncExecutor(tenantIdentityHolder));
         processEngineConfig.setJpaCloseEntityManager(true);
         processEngineConfig.setJpaHandleTransaction(true);
         processEngineConfig.setJpaEntityManagerFactory(entityManagerFactory);
-        processEngineConfig.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_DROP_CREATE);
+        processEngineConfig.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_TRUE);
         processEngineConfig.setDatabaseType(DATABASE_TYPE_POSTGRES);
         processEngineConfig.setHistory(HistoryLevel.FULL.getKey());
        // processEngineConfig.setDeploymentMode("resource-parent-folder");
-        tenantIdentityHolder.getAllTenants().parallelStream().forEach(tenant ->
+        tenantIdentityHolder.getAllTenants().parallelStream().filter(Objects::nonNull).forEach(tenant ->
             processEngineConfig.registerTenant(tenant, tenantawareDatasource)
         );
 
@@ -158,16 +164,25 @@ public class ApplicationConfig {
 
 
     @Bean
-    ProcessEngine processEngine(MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration) throws IOException, Exception {
+    ProcessEngine processEngine(MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration) throws Exception {
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
         Resource [] resources =  resourceResolver.getResources("classpath:process/**/*.bpmn");
 
-        for (Resource resource : resources) {
-            processEngine.getRepositoryService().createDeployment().
-                    addInputStream(resource.getFilename(), resource.getInputStream())
-                    .deploy();
-        }
+        tenants().parallelStream().forEach(tenant -> {
+            ProcessEngineThreadLocal.setTenant(tenant);
+                    for (Resource resource : resources) {
+                        try {
+                            processEngine.getRepositoryService().createDeployment().
+                                    addInputStream(resource.getFilename(), resource.getInputStream())
+                                    .deploy();
+
+                        } catch (Exception e) {
+                          //Ignore
+                        }
+                    }
+            ProcessEngineThreadLocal.clearTenant();
+        });
         return processEngine;
     }
 
@@ -194,6 +209,16 @@ public class ApplicationConfig {
     @Bean
     RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
+    }
+
+    @Bean
+    FormService formService(ProcessEngine processEngine) {
+        return processEngine.getFormService();
+    }
+
+    @Bean
+    IdentityService identityService(ProcessEngine processEngine) {
+        return processEngine.getIdentityService();
     }
 
 }

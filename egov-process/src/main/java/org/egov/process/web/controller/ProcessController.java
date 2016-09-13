@@ -2,6 +2,7 @@ package org.egov.process.web.controller;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
+import org.egov.process.config.multitenant.ProcessEngineThreadLocal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,10 +16,21 @@ public class ProcessController {
     @Autowired
     private HistoryService historyService;
 
-    @RequestMapping("/")
-    String show() {
-        runtimeService.startProcessInstanceByKey("sample").getProcessDefinitionKey();
+    @RequestMapping("/public")
+    String showPublic() {
+        ProcessEngineThreadLocal.setTenant("public");
+        runtimeService.startProcessInstanceByKey("helloWorld").getProcessDefinitionKey();
+        ProcessEngineThreadLocal.clearTenant();
 
-        return String.valueOf(historyService.createHistoricProcessInstanceQuery().finished().count());
+        return "OK";
+    }
+
+    @RequestMapping("/process")
+    String showProcess() {
+        ProcessEngineThreadLocal.setTenant("process");
+        runtimeService.startProcessInstanceByKey("helloWorld").getProcessDefinitionKey();
+        ProcessEngineThreadLocal.clearTenant();
+
+        return "OK";
     }
 }
