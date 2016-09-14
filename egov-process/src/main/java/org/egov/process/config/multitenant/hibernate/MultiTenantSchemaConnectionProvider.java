@@ -38,7 +38,7 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  */
 
-package org.egov.process.config.multitenant;
+package org.egov.process.config.multitenant.hibernate;
 
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.AvailableSettings;

@@ -1,4 +1,4 @@
-package org.egov.process.config.multitenant;
+package org.egov.process.config.multitenant.activiti;
 
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.CommandContext;

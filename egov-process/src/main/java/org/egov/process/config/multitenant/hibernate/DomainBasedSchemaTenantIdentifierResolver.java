@@ -38,8 +38,9 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  */
 
-package org.egov.process.config.multitenant;
+package org.egov.process.config.multitenant.hibernate;
 
+import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 public class DomainBasedSchemaTenantIdentifierResolver implements CurrentTenantIdentifierResolver {

@@ -1,4 +1,4 @@
-package org.egov.process.config.multitenant;
+package org.egov.process.config.multitenant.activiti;
 
 public class ProcessEngineThreadLocal {
 

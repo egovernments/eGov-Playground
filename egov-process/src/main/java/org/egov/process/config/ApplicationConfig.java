@@ -8,14 +8,13 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.activiti.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
-import org.egov.process.config.multitenant.DBSqlSessionFactory;
-import org.egov.process.config.multitenant.ProcessEngineThreadLocal;
-import org.egov.process.config.multitenant.TenantIdentityHolder;
-import org.egov.process.config.multitenant.TenantawareDatasource;
+import org.egov.process.config.multitenant.activiti.DBSqlSessionFactory;
+import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
+import org.egov.process.config.multitenant.activiti.TenantIdentityHolder;
+import org.egov.process.config.multitenant.activiti.TenantawareDatasource;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,18 +40,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP;
 import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES;
-import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE;
-import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE;
 import static org.hibernate.cfg.AvailableSettings.AUTO_CLOSE_SESSION;
 import static org.hibernate.cfg.AvailableSettings.DIALECT;
 import static org.hibernate.cfg.AvailableSettings.JTA_PLATFORM;
@@ -131,8 +126,8 @@ public class ApplicationConfig {
         properties.put(USE_STREAMS_FOR_BINARY, env.getProperty(USE_STREAMS_FOR_BINARY));
         properties.put(MULTI_TENANT, env.getProperty(MULTI_TENANT));
         properties.put("hibernate.database.type", env.getProperty("jpa.database"));
-        properties.put(MULTI_TENANT_CONNECTION_PROVIDER, "org.egov.process.config.multitenant.MultiTenantSchemaConnectionProvider");
-        properties.put(MULTI_TENANT_IDENTIFIER_RESOLVER, "org.egov.process.config.multitenant.DomainBasedSchemaTenantIdentifierResolver");
+        properties.put(MULTI_TENANT_CONNECTION_PROVIDER, "org.egov.process.config.multitenant.hibernate.MultiTenantSchemaConnectionProvider");
+        properties.put(MULTI_TENANT_IDENTIFIER_RESOLVER, "org.egov.process.config.multitenant.hibernate.DomainBasedSchemaTenantIdentifierResolver");
 
         return properties;
     }
