@@ -27,7 +27,7 @@ public class ProcessController {
 
     @RequestMapping("/process")
     String showProcess() {
-        ProcessEngineThreadLocal.setTenant("process");
+        ProcessEngineThreadLocal.setTenant("tenanta");
         runtimeService.startProcessInstanceByKey("helloWorld").getProcessDefinitionKey();
         ProcessEngineThreadLocal.clearTenant();
 

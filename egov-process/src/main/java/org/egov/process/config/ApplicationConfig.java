@@ -12,6 +12,7 @@ import org.activiti.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsync
 import org.activiti.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.egov.process.config.multitenant.DBSqlSessionFactory;
 import org.egov.process.config.multitenant.ProcessEngineThreadLocal;
 import org.egov.process.config.multitenant.TenantIdentityHolder;
 import org.egov.process.config.multitenant.TenantawareDatasource;
@@ -146,7 +147,7 @@ public class ApplicationConfig {
         processEngineConfig.setDataSource(tenantawareDatasource);
         processEngineConfig.setTransactionsExternallyManaged(true);
         processEngineConfig.setAsyncExecutorActivate(true);
-        processEngineConfig.setAsyncExecutorEnabled(true);
+        //processEngineConfig.setAsyncExecutorEnabled(true);
         processEngineConfig.setAsyncExecutor(new SharedExecutorServiceAsyncExecutor(tenantIdentityHolder));
         processEngineConfig.setJpaCloseEntityManager(true);
         processEngineConfig.setJpaHandleTransaction(true);
@@ -154,8 +155,10 @@ public class ApplicationConfig {
         processEngineConfig.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_TRUE);
         processEngineConfig.setDatabaseType(DATABASE_TYPE_POSTGRES);
         processEngineConfig.setHistory(HistoryLevel.FULL.getKey());
+        processEngineConfig.setDbSqlSessionFactory(new DBSqlSessionFactory());
+        processEngineConfig.setTablePrefixIsSchema(true);
        // processEngineConfig.setDeploymentMode("resource-parent-folder");
-        tenantIdentityHolder.getAllTenants().parallelStream().filter(Objects::nonNull).forEach(tenant ->
+       tenantIdentityHolder.getAllTenants().parallelStream().filter(Objects::nonNull).forEach(tenant ->
             processEngineConfig.registerTenant(tenant, tenantawareDatasource)
         );
 
