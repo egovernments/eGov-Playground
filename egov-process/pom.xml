@@ -99,6 +99,12 @@
             <version>3.1.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

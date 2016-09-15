@@ -12,8 +12,10 @@ import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEng
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.egov.process.config.multitenant.activiti.AsyncExecuterPerTenant;
 import org.egov.process.config.multitenant.activiti.DBSqlSessionFactory;
+import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
 import org.egov.process.config.multitenant.activiti.TenantIdentityHolder;
 import org.egov.process.config.multitenant.activiti.TenantawareDatasource;
+import org.egov.process.web.filter.TenantAwareProcessFilter;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -219,4 +221,8 @@ public class ApplicationConfig {
         return processEngine.getIdentityService();
     }
 
+    @Bean
+    TenantAwareProcessFilter tenantAwareProcessFilter() {
+        return new TenantAwareProcessFilter();
+    }
 }
