@@ -10,9 +10,9 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.egov.process.ResourceFinderUtil;
 import org.egov.process.config.multitenant.activiti.AsyncExecuterPerTenant;
 import org.egov.process.config.multitenant.activiti.DBSqlSessionFactory;
-import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
 import org.egov.process.config.multitenant.activiti.TenantIdentityHolder;
 import org.egov.process.config.multitenant.activiti.TenantawareDatasource;
 import org.egov.process.web.filter.TenantAwareProcessFilter;
@@ -26,7 +26,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -166,21 +165,27 @@ public class ApplicationConfig {
     ProcessEngine processEngine(MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration,
                                 TenantIdentityHolder tenantIdentityHolder) throws Exception {
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
-        PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-        Resource [] resources =  resourceResolver.getResources("classpath:process/**/*.bpmn");
+        ResourceFinderUtil resourceResolver = new ResourceFinderUtil();
 
-        tenants().forEach(tenant -> {
+
+        tenantIdentityHolder.getAllTenants().forEach(tenant -> {
             tenantIdentityHolder.setCurrentTenantId(tenant);
-                    for (Resource resource : resources) {
-                        try {
-                            processEngine.getRepositoryService().createDeployment().
-                                    addInputStream(resource.getFilename(), resource.getInputStream())
-                                    .deploy();
-
-                        } catch (Exception e) {
-                          //Ignore
-                        }
+                List<Resource> resources  =
+                        resourceResolver.getResources("classpath:process/main/*.bpmn",
+                        "classpath:process/"+tenant+"/*.bpmn",
+                                "classpath:process/main/*.bpmn20.xml",
+                                "classpath:process/"+tenant+"/*.bpmn20.xml"
+                                );
+                resources.forEach( resource -> {
+                    try {
+                        processEngine.getRepositoryService().createDeployment().
+                                addInputStream(resource.getFilename(), resource.getInputStream())
+                                .deploy();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error while deploying BPMN file", e);
                     }
+                });
+
             tenantIdentityHolder.clearCurrentTenantId();
         });
         return processEngine;
