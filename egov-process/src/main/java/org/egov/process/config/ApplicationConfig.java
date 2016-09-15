@@ -8,11 +8,10 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.egov.process.config.multitenant.activiti.AsyncExecuterPerTenant;
 import org.egov.process.config.multitenant.activiti.DBSqlSessionFactory;
-import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
 import org.egov.process.config.multitenant.activiti.TenantIdentityHolder;
 import org.egov.process.config.multitenant.activiti.TenantawareDatasource;
 import org.springframework.beans.factory.annotation.Autowire;
@@ -140,12 +139,12 @@ public class ApplicationConfig {
                                                                 TenantawareDatasource tenantawareDatasource) {
         MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfig = new MultiSchemaMultiTenantProcessEngineConfiguration(tenantIdentityHolder);
         processEngineConfig.setDataSource(tenantawareDatasource);
-        processEngineConfig.setTransactionsExternallyManaged(true);
+        processEngineConfig.setTransactionsExternallyManaged(false);
         processEngineConfig.setAsyncExecutorActivate(true);
         //processEngineConfig.setAsyncExecutorEnabled(true);
-        processEngineConfig.setAsyncExecutor(new SharedExecutorServiceAsyncExecutor(tenantIdentityHolder));
-        processEngineConfig.setJpaCloseEntityManager(true);
-        processEngineConfig.setJpaHandleTransaction(true);
+        processEngineConfig.setAsyncExecutor(new AsyncExecuterPerTenant(tenantIdentityHolder));
+        processEngineConfig.setJpaCloseEntityManager(false);
+        processEngineConfig.setJpaHandleTransaction(false);
         processEngineConfig.setJpaEntityManagerFactory(entityManagerFactory);
         processEngineConfig.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_TRUE);
         processEngineConfig.setDatabaseType(DATABASE_TYPE_POSTGRES);
@@ -153,7 +152,7 @@ public class ApplicationConfig {
         processEngineConfig.setDbSqlSessionFactory(new DBSqlSessionFactory());
         processEngineConfig.setTablePrefixIsSchema(true);
        // processEngineConfig.setDeploymentMode("resource-parent-folder");
-       tenantIdentityHolder.getAllTenants().parallelStream().filter(Objects::nonNull).forEach(tenant ->
+        tenantIdentityHolder.getAllTenants().stream().filter(Objects::nonNull).forEach(tenant ->
             processEngineConfig.registerTenant(tenant, tenantawareDatasource)
         );
 
@@ -162,13 +161,14 @@ public class ApplicationConfig {
 
 
     @Bean
-    ProcessEngine processEngine(MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration) throws Exception {
+    ProcessEngine processEngine(MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration,
+                                TenantIdentityHolder tenantIdentityHolder) throws Exception {
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
         Resource [] resources =  resourceResolver.getResources("classpath:process/**/*.bpmn");
 
-        tenants().parallelStream().forEach(tenant -> {
-            ProcessEngineThreadLocal.setTenant(tenant);
+        tenants().forEach(tenant -> {
+            tenantIdentityHolder.setCurrentTenantId(tenant);
                     for (Resource resource : resources) {
                         try {
                             processEngine.getRepositoryService().createDeployment().
@@ -179,7 +179,7 @@ public class ApplicationConfig {
                           //Ignore
                         }
                     }
-            ProcessEngineThreadLocal.clearTenant();
+            tenantIdentityHolder.clearCurrentTenantId();
         });
         return processEngine;
     }

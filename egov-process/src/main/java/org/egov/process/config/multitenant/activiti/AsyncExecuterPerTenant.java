@@ -30,6 +30,7 @@ public class AsyncExecuterPerTenant extends ExecutorPerTenantAsyncExecutor {
             defaultAsyncJobExecutor.setAsyncJobsDueRunnable(new TenantAwareAcquireAsyncJobsDueRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
             defaultAsyncJobExecutor.setTimerJobRunnable(new TenantAwareAcquireTimerJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
             defaultAsyncJobExecutor.setExecuteAsyncRunnableFactory(new TenantAwareExecuteAsyncRunnableFactory(tenantInfoHolder, tenantId));
+            defaultAsyncJobExecutor.setResetExpiredJobsRunnable(new TenantAwareResetExpiredJobRunnable(defaultAsyncJobExecutor,tenantInfoHolder, tenantId));
         }
         tenantExecutors.put(tenantId, tenantExecutor);
 
