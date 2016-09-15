@@ -23,7 +23,7 @@ public class AsyncExecuterPerTenant extends ExecutorPerTenantAsyncExecutor {
             tenantExecutor = tenantAwareAyncExecutorFactory.createAsyncExecutor(tenantId);
         }
 
-        tenantExecutor.setProcessEngineConfiguration(processEngineConfiguration); // Needs to be done for job executors created after boot. Doesn't hurt on boot.
+        tenantExecutor.setProcessEngineConfiguration(processEngineConfiguration);
 
         if (tenantExecutor instanceof DefaultAsyncJobExecutor) {
             DefaultAsyncJobExecutor defaultAsyncJobExecutor = (DefaultAsyncJobExecutor) tenantExecutor;
@@ -40,6 +40,9 @@ public class AsyncExecuterPerTenant extends ExecutorPerTenantAsyncExecutor {
     }
 
     public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-          this.processEngineConfiguration = processEngineConfiguration;
+        this.processEngineConfiguration = processEngineConfiguration;
+        for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
+            asyncExecutor.setProcessEngineConfiguration(processEngineConfiguration);
+        }
     }
 }
