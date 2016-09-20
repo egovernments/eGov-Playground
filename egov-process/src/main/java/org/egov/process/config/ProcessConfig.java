@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES;
@@ -95,7 +96,10 @@ public class ProcessConfig {
                     "classpath:processes/" + tenant + "/*.bpmn",
                     "classpath:processes/" + tenant + "/*.bpmn20.xml"
             );
-            resources.addAll(commonBpmnResources);
+            List<String> resourceNames = resources.stream().map(Resource::getFilename).collect(Collectors.toList());
+            resources.addAll(commonBpmnResources.stream().
+                    filter(rsrc -> !resourceNames.contains(rsrc.getFilename())).
+                    collect(Collectors.toList()));
             DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment().
                     enableDuplicateFiltering().tenantId(tenant);
             for (Resource resource : resources) {
