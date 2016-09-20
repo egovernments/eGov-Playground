@@ -28,9 +28,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES;
@@ -83,20 +85,27 @@ public class ProcessConfig {
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         ResourceFinderUtil resourceResolver = new ResourceFinderUtil();
 
+        List<Resource> commonBpmnResources  =
+                resourceResolver.getResources("classpath:processes/main/*.bpmn",
+                        "classpath:processes/main/*.bpmn20.xml");
 
         tenantIdentityHolder.getAllTenants().forEach(tenant -> {
             tenantIdentityHolder.setCurrentTenantId(tenant);
-            List<Resource> resources  =
-                    resourceResolver.getResources("classpath:processes/main/*.bpmn",
-                            "classpath:processes/"+tenant+"/*.bpmn",
-                            "classpath:processes/main/*.bpmn20.xml",
-                            "classpath:processes/"+tenant+"/*.bpmn20.xml"
+            List<Resource> resources  = resourceResolver.getResources(
+                    "classpath:processes/"+tenant+"/*.bpmn",
+                    "classpath:processes/"+tenant+"/*.bpmn20.xml"
                     );
+            //TODO Distill this logic
+            List<String> resourceFileNames = resources.parallelStream().map(Resource::getFilename).
+                    collect(Collectors.toList());
+            List<Resource> tmpResource = new ArrayList<>(commonBpmnResources);
+            tmpResource.removeIf(resource -> resourceFileNames.contains(resource.getFilename()));
+            resources.addAll(tmpResource);
             resources.forEach( resource -> {
                 try {
                     processEngine.getRepositoryService().createDeployment().
                             addInputStream(resource.getFilename(), resource.getInputStream())
-                            .deploy();
+                            .tenantId(tenant).deploy();
                 } catch (Exception e) {
                     throw new RuntimeException("Error while deploying BPMN file", e);
                 }

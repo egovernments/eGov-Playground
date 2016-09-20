@@ -13,12 +13,8 @@ public class ProcessController {
     private RuntimeService runtimeService;
 
     @RequestMapping("/start")
-    String showPublic() {
-        return ProcessEngineThreadLocal.getTenant()+ "<br/>" +runtimeService.startProcessInstanceByKey("helloWorld").getProcessDefinitionKey();
-    }
-
-    @RequestMapping("/start/specific")
-    String showTenantSpecific() {
-        return ProcessEngineThreadLocal.getTenant()+ "<br/>" +runtimeService.startProcessInstanceByKey(ProcessEngineThreadLocal.getTenant()+ "_helloWorld").getProcessDefinitionKey();
+    String startProcess() {
+        return ProcessEngineThreadLocal.getTenant()+ "<br/>" +
+                runtimeService.startProcessInstanceByKeyAndTenantId("helloWorld", ProcessEngineThreadLocal.getTenant()).getProcessDefinitionKey();
     }
 }

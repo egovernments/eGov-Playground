@@ -4,7 +4,7 @@
 xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
 targetNamespace="http://www.activiti.org/bpmn2.0">
  
-  <process id="tenanttwo_helloWorld">
+  <process id="helloWorld">
  
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="script" />
