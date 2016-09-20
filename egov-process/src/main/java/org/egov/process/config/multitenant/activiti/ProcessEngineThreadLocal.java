@@ -14,5 +14,6 @@ public class ProcessEngineThreadLocal {
 
     public static void clearTenant() {
         TENANT_THREAD_LOCAL.remove();
+        TENANT_THREAD_LOCAL.set(null);
     }
 }

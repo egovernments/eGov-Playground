@@ -10,6 +10,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.spring.SpringExpressionManager;
 import org.egov.process.ResourceFinderUtil;
 import org.egov.process.config.auth.ProcessAuthConfigurator;
@@ -28,11 +29,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES;
@@ -81,38 +81,30 @@ public class ProcessConfig {
 
     @Bean
     ProcessEngine processEngine(MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration,
-                                TenantIdentityHolder tenantIdentityHolder) throws Exception {
+                                TenantIdentityHolder tenantIdentityHolder) throws IOException {
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         ResourceFinderUtil resourceResolver = new ResourceFinderUtil();
 
-        List<Resource> commonBpmnResources  =
+        List<Resource> commonBpmnResources =
                 resourceResolver.getResources("classpath:processes/main/*.bpmn",
                         "classpath:processes/main/*.bpmn20.xml");
 
-        tenantIdentityHolder.getAllTenants().forEach(tenant -> {
+        for (String tenant : tenantIdentityHolder.getAllTenants()) {
             tenantIdentityHolder.setCurrentTenantId(tenant);
-            List<Resource> resources  = resourceResolver.getResources(
-                    "classpath:processes/"+tenant+"/*.bpmn",
-                    "classpath:processes/"+tenant+"/*.bpmn20.xml"
-                    );
-            //TODO Distill this logic
-            List<String> resourceFileNames = resources.parallelStream().map(Resource::getFilename).
-                    collect(Collectors.toList());
-            List<Resource> tmpResource = new ArrayList<>(commonBpmnResources);
-            tmpResource.removeIf(resource -> resourceFileNames.contains(resource.getFilename()));
-            resources.addAll(tmpResource);
-            resources.forEach( resource -> {
-                try {
-                    processEngine.getRepositoryService().createDeployment().
-                            addInputStream(resource.getFilename(), resource.getInputStream())
-                            .tenantId(tenant).deploy();
-                } catch (Exception e) {
-                    throw new RuntimeException("Error while deploying BPMN file", e);
-                }
-            });
-
+            List<Resource> resources = resourceResolver.getResources(
+                    "classpath:processes/" + tenant + "/*.bpmn",
+                    "classpath:processes/" + tenant + "/*.bpmn20.xml"
+            );
+            resources.addAll(commonBpmnResources);
+            DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment().
+                    enableDuplicateFiltering().tenantId(tenant);
+            for (Resource resource : resources) {
+                deploymentBuilder.name(tenant + "-" + resource.getFilename()).
+                        addInputStream(resource.getFilename(), resource.getInputStream());
+            }
+            deploymentBuilder.deploy();
             tenantIdentityHolder.clearCurrentTenantId();
-        });
+        }
         return processEngine;
     }
 
