@@ -10,6 +10,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.spring.SpringExpressionManager;
 import org.egov.process.ResourceFinderUtil;
 import org.egov.process.config.auth.ProcessAuthConfigurator;
 import org.egov.process.config.multitenant.activiti.AsyncExecuterPerTenant;
@@ -18,6 +19,7 @@ import org.egov.process.config.multitenant.activiti.TenantIdentityHolder;
 import org.egov.process.config.multitenant.activiti.TenantawareDatasource;
 import org.egov.process.web.filter.TenantAwareProcessFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -42,6 +44,9 @@ public class ProcessConfig {
     @Autowired
     ProcessAuthConfigurator processAuthConfigurator;
 
+    @Autowired
+    private ApplicationContext appContext;
+
     @Bean
     @DependsOn("tenants")
     MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfiguration(EntityManagerFactory entityManagerFactory,
@@ -61,6 +66,7 @@ public class ProcessConfig {
         processEngineConfig.setHistory(HistoryLevel.FULL.getKey());
         processEngineConfig.setDbSqlSessionFactory(new DBSqlSessionFactory());
         processEngineConfig.setTablePrefixIsSchema(true);
+        processEngineConfig.setExpressionManager(new SpringExpressionManager(appContext, null));
         // processEngineConfig.setDeploymentMode("resource-parent-folder");
         processEngineConfig.setConfigurators(Arrays.asList(processAuthConfigurator));
         tenantIdentityHolder.getAllTenants().stream().filter(Objects::nonNull).forEach(tenant ->
@@ -81,10 +87,10 @@ public class ProcessConfig {
         tenantIdentityHolder.getAllTenants().forEach(tenant -> {
             tenantIdentityHolder.setCurrentTenantId(tenant);
             List<Resource> resources  =
-                    resourceResolver.getResources("classpath:process/main/*.bpmn",
-                            "classpath:process/"+tenant+"/*.bpmn",
-                            "classpath:process/main/*.bpmn20.xml",
-                            "classpath:process/"+tenant+"/*.bpmn20.xml"
+                    resourceResolver.getResources("classpath:processes/main/*.bpmn",
+                            "classpath:processes/"+tenant+"/*.bpmn",
+                            "classpath:processes/main/*.bpmn20.xml",
+                            "classpath:processes/"+tenant+"/*.bpmn20.xml"
                     );
             resources.forEach( resource -> {
                 try {
