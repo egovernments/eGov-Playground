@@ -9,6 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -37,6 +38,7 @@ import static org.hibernate.cfg.AvailableSettings.USE_STREAMS_FOR_BINARY;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackages = "org.egov.process.repository")
 @PropertySource("classpath:application.properties")
 @Configuration
 @Order(HIGHEST_PRECEDENCE)

@@ -35,14 +35,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.activiti.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES;
 import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 
-@EnableJpaRepositories(basePackages = "org.egov.process.repository")
 @Configuration
 @Order(LOWEST_PRECEDENCE)
 public class ProcessConfig {
+
+    private static final String BPMN_FILE_CLASSPATH_LOCATION =  "classpath:processes/%s/*.bpmn";
+    private static final String BPMN20_FILE_CLASSPATH_LOCATION =  "classpath:processes/%s/*.bpmn20.xml";
 
     @Autowired
     ProcessAuthConfigurator processAuthConfigurator;
@@ -87,26 +90,23 @@ public class ProcessConfig {
         ResourceFinderUtil resourceResolver = new ResourceFinderUtil();
 
         List<Resource> commonBpmnResources =
-                resourceResolver.getResources("classpath:processes/main/*.bpmn",
-                        "classpath:processes/main/*.bpmn20.xml");
+                resourceResolver.getResources("classpath:processes/common/*.bpmn",
+                        "classpath:processes/common/*.bpmn20.xml");
 
         for (String tenant : tenantIdentityHolder.getAllTenants()) {
             tenantIdentityHolder.setCurrentTenantId(tenant);
-            List<Resource> resources = resourceResolver.getResources(
-                    "classpath:processes/" + tenant + "/*.bpmn",
-                    "classpath:processes/" + tenant + "/*.bpmn20.xml"
-            );
+
+            List<Resource> resources = resourceResolver.getResources(format(BPMN_FILE_CLASSPATH_LOCATION, tenant),
+                    format(BPMN20_FILE_CLASSPATH_LOCATION, tenant));
             List<String> resourceNames = resources.stream().map(Resource::getFilename).collect(Collectors.toList());
             resources.addAll(commonBpmnResources.stream().
                     filter(rsrc -> !resourceNames.contains(rsrc.getFilename())).
                     collect(Collectors.toList()));
-            DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService().createDeployment().
-                    enableDuplicateFiltering().tenantId(tenant);
             for (Resource resource : resources) {
-                deploymentBuilder.name(tenant + "-" + resource.getFilename()).
-                        addInputStream(resource.getFilename(), resource.getInputStream());
+                processEngine.getRepositoryService().createDeployment().
+                        enableDuplicateFiltering().tenantId(tenant).name(resource.getFilename()).
+                        addInputStream(resource.getFilename(), resource.getInputStream()).deploy();
             }
-            deploymentBuilder.deploy();
             tenantIdentityHolder.clearCurrentTenantId();
         }
         return processEngine;
