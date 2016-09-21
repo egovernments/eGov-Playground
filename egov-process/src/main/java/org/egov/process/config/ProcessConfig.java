@@ -60,7 +60,7 @@ public class ProcessConfig {
                                                                                 TenantawareDatasource tenantawareDatasource) {
         MultiSchemaMultiTenantProcessEngineConfiguration processEngineConfig = new MultiSchemaMultiTenantProcessEngineConfiguration(tenantIdentityHolder);
         processEngineConfig.setDataSource(tenantawareDatasource);
-        processEngineConfig.setTransactionsExternallyManaged(false);
+        processEngineConfig.setTransactionsExternallyManaged(true);
         processEngineConfig.setAsyncExecutorActivate(true);
         //processEngineConfig.setAsyncExecutorEnabled(true);
         processEngineConfig.setAsyncExecutor(new AsyncExecuterPerTenant(tenantIdentityHolder));
@@ -104,7 +104,7 @@ public class ProcessConfig {
                     collect(Collectors.toList()));
             for (Resource resource : resources) {
                 processEngine.getRepositoryService().createDeployment().
-                        enableDuplicateFiltering().tenantId(tenant).name(resource.getFilename()).
+                        enableDuplicateFiltering().name(resource.getFilename()).
                         addInputStream(resource.getFilename(), resource.getInputStream()).deploy();
             }
             tenantIdentityHolder.clearCurrentTenantId();

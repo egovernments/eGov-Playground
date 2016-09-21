@@ -15,6 +15,6 @@ public class ProcessController {
     @RequestMapping("/start")
     String startProcess() {
         return ProcessEngineThreadLocal.getTenant()+ "<br/>" +
-                runtimeService.startProcessInstanceByKeyAndTenantId("helloWorld", ProcessEngineThreadLocal.getTenant()).getProcessDefinitionKey();
+                runtimeService.startProcessInstanceByKey("helloWorld").getProcessDefinitionKey();
     }
 }
