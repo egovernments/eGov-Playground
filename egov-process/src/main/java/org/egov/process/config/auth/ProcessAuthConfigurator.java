@@ -2,7 +2,7 @@ package org.egov.process.config.auth;
 
 import org.activiti.engine.cfg.AbstractProcessEngineConfigurator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.egov.process.service.UserGroupService;
+import org.egov.process.service.GroupService;
 import org.egov.process.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ public class ProcessAuthConfigurator extends AbstractProcessEngineConfigurator{
     private UserService userService;
 
     @Autowired
-    private UserGroupService userGroupService;
+    private GroupService userGroupService;
 
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         processEngineConfiguration.setUserEntityManager(new ProcessUserManager(processEngineConfiguration, userService));

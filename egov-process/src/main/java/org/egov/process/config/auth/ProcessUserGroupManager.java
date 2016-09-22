@@ -1,7 +1,6 @@
 package org.egov.process.config.auth;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.GroupQuery;
 import org.activiti.engine.impl.GroupQueryImpl;
 import org.activiti.engine.impl.Page;
@@ -10,8 +9,8 @@ import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.impl.persistence.entity.GroupEntity;
 import org.activiti.engine.impl.persistence.entity.GroupEntityImpl;
 import org.activiti.engine.impl.persistence.entity.GroupEntityManager;
-import org.egov.process.entity.UserGroup;
-import org.egov.process.service.UserGroupService;
+import org.egov.process.entity.Group;
+import org.egov.process.service.GroupService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,24 +21,24 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ProcessUserGroupManager extends AbstractManager implements GroupEntityManager {
 
-    private UserGroupService userGroupService;
+    private GroupService userGroupService;
 
-    public ProcessUserGroupManager(final ProcessEngineConfigurationImpl processEngineConfiguration, UserGroupService userGroupService) {
+    public ProcessUserGroupManager(final ProcessEngineConfigurationImpl processEngineConfiguration, GroupService userGroupService) {
         super(processEngineConfiguration);
         this.userGroupService = userGroupService;
     }
 
     @Override
     public GroupEntity findById(final String entityId) {
-        return mapUserGroupToGroupEntity(userGroupService.getUserGroupByName(entityId));
+        return mapUserGroupToGroupEntity(userGroupService.getGroupByName(entityId));
     }
 
     @Override
-    public List<Group> findGroupByQueryCriteria(final GroupQueryImpl query, final Page page) {
+    public List<org.activiti.engine.identity.Group> findGroupByQueryCriteria(final GroupQueryImpl query, final Page page) {
         if (isNotBlank(query.getName()))
             return Arrays.asList(findById(query.getName()));
         if (isNotBlank(query.getNameLike()))
-            return userGroupService.getUserGroupsByNameLike(query.getNameLike()).stream().
+            return userGroupService.getGroupsByNameLike(query.getNameLike()).stream().
                     map(this::mapUserGroupToGroupEntity).collect(Collectors.toList());
         return null;
     }
@@ -50,13 +49,13 @@ public class ProcessUserGroupManager extends AbstractManager implements GroupEnt
     }
 
     @Override
-    public List<Group> findGroupsByUser(final String userId) {
+    public List<org.activiti.engine.identity.Group> findGroupsByUser(final String userId) {
         //TODO has to implement if required
         return null;
     }
 
     @Override
-    public List<Group> findGroupsByNativeQuery(final Map<String, Object> parameterMap, final int firstResult, final int maxResults) {
+    public List<org.activiti.engine.identity.Group> findGroupsByNativeQuery(final Map<String, Object> parameterMap, final int firstResult, final int maxResults) {
         throw new ActivitiException("Process user group manager doesn't support native query on group");
     }
 
@@ -66,7 +65,7 @@ public class ProcessUserGroupManager extends AbstractManager implements GroupEnt
     }
 
     @Override
-    public Group createNewGroup(final String groupId) {
+    public org.activiti.engine.identity.Group createNewGroup(final String groupId) {
         throw new ActivitiException("Process user group manager doesn't support creating a new group");
     }
 
@@ -76,7 +75,7 @@ public class ProcessUserGroupManager extends AbstractManager implements GroupEnt
     }
 
     @Override
-    public boolean isNewGroup(final Group group) {
+    public boolean isNewGroup(final org.activiti.engine.identity.Group group) {
         throw new ActivitiException("Process user group manager doesn't support checking is new group");
     }
 
@@ -122,10 +121,10 @@ public class ProcessUserGroupManager extends AbstractManager implements GroupEnt
         throw new ActivitiException("Process user group manager doesn't support delete a group");
     }
 
-    private GroupEntity mapUserGroupToGroupEntity(UserGroup userGroup) {
+    private GroupEntity mapUserGroupToGroupEntity(Group group) {
         GroupEntity groupEntity = new GroupEntityImpl();
-        groupEntity.setName(userGroup.getName());
-        groupEntity.setType(userGroup.getType());
+        groupEntity.setName(group.getName());
+        groupEntity.setType(group.getType());
         return groupEntity;
     }
 }
