@@ -49,7 +49,7 @@ public class NumberGenerationService {
 		return processInstance.getProcessInstanceId();
 	}
 
-	//@Transactional
+	@Transactional
 	public String process(String userName, String message,
 			String processInstanceId) {
 
