@@ -10,6 +10,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class NumberGenerationService {
+public class NumberGenerationService  {
 	private static Logger Log = Logger.getLogger(NumberGenerationService.class);
 
 	@Autowired
@@ -35,12 +36,11 @@ public class NumberGenerationService {
 	private IdentityService iservice;
 
 	 
-	public String start(String message) {
+	public String start(String message,String bpmnkey) {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("description", message);
 		ProcessInstance processInstance = runtimeService
-				.startProcessInstanceByKeyAndTenantId("bill",
-						ProcessEngineThreadLocal.getTenant());
+				.startProcessInstanceByKey(bpmnkey);
 		processInstance.isEnded();
 		// Verify that we started a new process instance
 		Log.info("Number of process instances: "
@@ -83,5 +83,17 @@ public class NumberGenerationService {
 		}
 
 	}
+	
+	public void print(DelegateExecution execution)  {
+	    String var = (String) execution.getVariable("input");
+	    var = var.toUpperCase();
+	    execution.setVariable("input", var);
+	  }
+	
+	public void print()  {
+	   System.out.println("printing.......................................");
+	  }
 
+	
+	
 }

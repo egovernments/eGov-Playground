@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="TestAlltasks" name="TestAlltasks" isExecutable="true">
+    <documentation>Testing all tasks</documentation>
+    <startEvent id="start"/>
+    <userTask id="First" name="assinged user to kavya&#xa;" activiti:assignee="kavya">
+      <extensionElements>
+        <modeler:activiti-idm-assignee xmlns:modeler="http://activiti.com/modeler"><![CDATA[true]]></modeler:activiti-idm-assignee>
+        <modeler:assignee-info-email xmlns:modeler="http://activiti.com/modeler"><![CDATA[kavya.ys@egovernments.org]]></modeler:assignee-info-email>
+        <modeler:assignee-info-firstname xmlns:modeler="http://activiti.com/modeler"><![CDATA[kavya]]></modeler:assignee-info-firstname>
+        <modeler:assignee-info-lastname xmlns:modeler="http://activiti.com/modeler"><![CDATA[kavya]]></modeler:assignee-info-lastname>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="secondserv" name="service task1" activiti:expression="#{numberGenerationService.print()}" activiti:resultVariableName="input"/>
+    <sequenceFlow id="sid-650FC254-7DC1-4267-8F63-FE7159C1B767" sourceRef="First" targetRef="secondserv"/>
+    <endEvent id="end" name="end"/>
+    <sequenceFlow id="sid-38F0C388-922F-4DB7-BAAB-A97FB3719C76" sourceRef="secondserv" targetRef="end"/>
+    <sequenceFlow id="sid-359DBEB8-407A-4622-8542-AB8AD571FC56" sourceRef="start" targetRef="First"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_TestAlltasks">
+    <bpmndi:BPMNPlane bpmnElement="TestAlltasks" id="BPMNPlane_TestAlltasks">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="75.0" y="165.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="First" id="BPMNShape_First">
+        <omgdc:Bounds height="80.0" width="100.0" x="255.0" y="195.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="secondserv" id="BPMNShape_secondserv">
+        <omgdc:Bounds height="80.0" width="100.0" x="442.25" y="126.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="28.0" width="28.0" x="699.25" y="152.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-38F0C388-922F-4DB7-BAAB-A97FB3719C76" id="BPMNEdge_sid-38F0C388-922F-4DB7-BAAB-A97FB3719C76">
+        <omgdi:waypoint x="542.25" y="166.0"/>
+        <omgdi:waypoint x="699.25" y="166.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-359DBEB8-407A-4622-8542-AB8AD571FC56" id="BPMNEdge_sid-359DBEB8-407A-4622-8542-AB8AD571FC56">
+        <omgdi:waypoint x="104.53204056716349" y="183.7174987497395"/>
+        <omgdi:waypoint x="255.0" y="222.2093023255814"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-650FC254-7DC1-4267-8F63-FE7159C1B767" id="BPMNEdge_sid-650FC254-7DC1-4267-8F63-FE7159C1B767">
+        <omgdi:waypoint x="355.0" y="216.5754339118825"/>
+        <omgdi:waypoint x="442.25" y="184.4245660881175"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
