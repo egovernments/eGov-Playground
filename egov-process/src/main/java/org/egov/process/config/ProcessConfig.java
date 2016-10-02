@@ -94,6 +94,7 @@ public class ProcessConfig {
                         "classpath:processes/common/*.bpmn20.xml");
 
         for (String tenant : tenantIdentityHolder.getAllTenants()) {
+        	System.out.println(tenant);
             tenantIdentityHolder.setCurrentTenantId(tenant);
 
             List<Resource> resources = resourceResolver.getResources(format(BPMN_FILE_CLASSPATH_LOCATION, tenant),
@@ -103,6 +104,7 @@ public class ProcessConfig {
                     filter(rsrc -> !resourceNames.contains(rsrc.getFilename())).
                     collect(Collectors.toList()));
             for (Resource resource : resources) {
+            	System.out.println(resource.getFilename());
                 processEngine.getRepositoryService().createDeployment().
                         enableDuplicateFiltering().name(resource.getFilename()).
                         addInputStream(resource.getFilename(), resource.getInputStream()).deploy();

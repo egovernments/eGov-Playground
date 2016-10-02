@@ -2,3 +2,5 @@
 *.iml
 target
 rebel.xml
+/.classpath
+/.project

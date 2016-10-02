@@ -3,6 +3,11 @@ package org.egov.process.entity;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
+
+import org.hibernate.validator.constraints.Length;
+
+
 
 @Entity
 @Table(name = "eg_user")
@@ -10,11 +15,26 @@ public class User {
 
     @Id
     private Long id;
+    @Length(max=20)
+    
+	
     private String userName;
+    @Length(max=20)
+    
+	
     private String firstName;
+    
+	
+    @Length(max=20)
     private String lastName;
+    
+	
+    @Length(max=20)
     private String email;
+    @Length(max=20)
     private String password;
+    @Version
+    private Long version;
 
     public Long getId() {
         return id;

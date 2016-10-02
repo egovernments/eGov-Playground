@@ -1,5 +1,6 @@
 package org.egov.process.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +8,6 @@ import java.util.Map;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -15,7 +15,6 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,8 @@ public class NumberGenerationService  {
 
 	 
 	public String start(String message,String bpmnkey) {
+		if(bpmnkey.contains("Mail"))
+			return email(message,bpmnkey);
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("description", message);
 		ProcessInstance processInstance = runtimeService
@@ -47,6 +48,27 @@ public class NumberGenerationService  {
 				+ runtimeService.createProcessInstanceQuery().count());
 		Log.info("Start userId" + processInstance.getStartUserId());
 		return processInstance.getProcessInstanceId();
+	}
+
+	private String email(String message, String bpmnkey) {
+		String from = "manikanta@egovernments.org";
+	    boolean male = true;
+	    String recipientName = "mani Doe";
+	    String recipient = "manikanta@egovernments.org";
+	    Date now = new Date();
+	    String orderId = "123456";
+	    
+	    Map<String, Object> vars = new HashMap<String, Object>();
+	    vars.put("sender", from);
+	    vars.put("recipient", recipient);
+	    vars.put("recipientName", recipientName);
+	    vars.put("male", male);
+	    vars.put("now", now);
+	    vars.put("orderId", orderId);
+	    
+	    runtimeService.startProcessInstanceByKey(bpmnkey, vars);
+	  
+	    return "check your email";
 	}
 
 	@Transactional

@@ -7,6 +7,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Version;
+
+import org.hibernate.validator.constraints.Length;
+
+
+
 import java.util.List;
 
 @Entity
@@ -15,8 +21,16 @@ public class Group {
 
     @Id
     private Long id;
+    
+	
+    @Length(max=20)
     private String name;
+    
+	
+    @Length(max=20)
     private String type;
+    @Version
+    private Long version;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

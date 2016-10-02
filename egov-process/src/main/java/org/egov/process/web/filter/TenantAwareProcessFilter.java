@@ -3,6 +3,7 @@ package org.egov.process.web.filter;
 import org.egov.process.config.multitenant.activiti.ProcessEngineThreadLocal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -12,7 +13,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Map;
 
+@Component
 public class TenantAwareProcessFilter implements Filter {
 
     @Autowired
@@ -28,6 +31,14 @@ public class TenantAwareProcessFilter implements Filter {
         try {
             final String domainURL = extractRequestedDomainName(((HttpServletRequest) request).getRequestURL().toString());
             ProcessEngineThreadLocal.setTenant(environment.getProperty("tenant." + domainURL));
+
+    		/*System.err.println(request.getParameterMap());
+    		Map<String, String[]> parameterMap = request.getParameterMap();
+    		for(String s:parameterMap.keySet())
+    		{
+    		System.err.println(parameterMap.get(s));
+    		}*/
+    		
             chain.doFilter(request, response);
         } finally {
             ProcessEngineThreadLocal.clearTenant();
