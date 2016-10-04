@@ -14,11 +14,10 @@
 			id="resultTable">
 			<thead>
 				<tr>
-					<th><spring:message code="lbl.taskid" /></th>
 					<th><spring:message code="lbl.sender" /></th>
+					<th><spring:message code="lbl.date" /></th>
 					<th><spring:message code="lbl.natureofwork" /></th>
 					<th><spring:message code="lbl.details" /></th>
-					<th><spring:message code="lbl.link" /></th>
 				</tr>
 			</thead>
 		</table>

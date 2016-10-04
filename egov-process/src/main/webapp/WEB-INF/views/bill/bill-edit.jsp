@@ -6,6 +6,20 @@
 	>
 	<%@ include file="bill-form.jsp"%>
 	<input type="hidden" name="bill" value="${bill.id}" />
+	<input type="hidden" name="taskId" value="${bill.taskId}" />
+	<div class="panel-heading">
+					<div class="panel-title">Workflow details</div>
+				</div>
+	<div class="form-group">
+						<label class="col-sm-3 control-label text-right">Message</label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="message"
+								class="form-control text-left " />
+							
+						</div>
+   </div>
+					
+	
 	</div>
 	</div>
 	</div>

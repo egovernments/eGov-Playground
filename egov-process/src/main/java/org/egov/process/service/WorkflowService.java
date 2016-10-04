@@ -130,6 +130,7 @@ public class WorkflowService  {
 		} 
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("description", message);
+		variables.put("objectId", id);
 		ProcessInstance processInstance = runtimeService
 				.startProcessInstanceByKey(workflowType.getBusinessKey(),variables);
 		  System.out.println("Worflow Started .Instance id"+processInstance.getId());
@@ -137,13 +138,16 @@ public class WorkflowService  {
 		return true;
 	}
 	
-	public boolean update(String taskId,Long id,String message)
+	public boolean update(String taskId,Long id,String message,String sender)
 	{
 		
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		//verify
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("description", message);
+		variables.put("sender", sender);
+		variables.put("objectId", id.toString());
+		taskService.addComment(task.getId(), task.getProcessInstanceId(), message);
 		taskService.complete(task.getId(),variables);
 		return true;
 	}

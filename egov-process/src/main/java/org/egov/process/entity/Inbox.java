@@ -7,8 +7,11 @@ public class Inbox {
  private Long id;
 
  private String taskId;
+ 
+ private String wfDate;
 
- private String sender;
+ 
+private String sender;
 
  private String natureOfWork;
 
@@ -52,5 +55,10 @@ public class Inbox {
 	public void setLink(String link) {
 		this.link = link;
 	}
-
+	public String getWfDate() {
+		return wfDate;
+	}
+	public void setWfDate(String wfDate) {
+		this.wfDate = wfDate;
+	}
 }

@@ -32,7 +32,15 @@ public class InboxJsonAdaptor implements JsonSerializer<Inbox> {
 				jsonObject.addProperty("link", inbox.getLink());
 			else
 				jsonObject.addProperty("link", "");
-			jsonObject.addProperty("id", inbox.getId());
+			if (inbox.getWfDate() != null)
+				jsonObject.addProperty("wfDate", inbox.getWfDate());
+			else
+				jsonObject.addProperty("wfDate", "");
+			
+			if (inbox.getId() != null)
+				jsonObject.addProperty("id", inbox.getId());
+			else
+				jsonObject.addProperty("id", "");
 		}
 		return jsonObject;
 	}

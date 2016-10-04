@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.egov.process.entity.Bill;
@@ -82,6 +83,15 @@ public class BillController {
 		return "redirect:/bill/result/" + bill.getId();
 	}
 
+	@RequestMapping(value = "/processwf/{id}/{taskId}", method = RequestMethod.GET)
+	public String edit(@PathVariable("id") final Long id,@PathVariable("taskId") final String taskId, Model model) {
+		Bill bill = billService.findOne(id);
+		bill.setTaskId(taskId);
+		prepareNewForm(model);
+		model.addAttribute("bill", bill);
+		return BILL_EDIT;
+	}
+	
 	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") final Long id, Model model) {
 		Bill bill = billService.findOne(id);
@@ -92,13 +102,13 @@ public class BillController {
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public String update(@Valid @ModelAttribute final Bill bill, final BindingResult errors, final Model model,
-			final RedirectAttributes redirectAttrs) {
+			final RedirectAttributes redirectAttrs,HttpServletRequest request) {
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 			return BILL_EDIT;
 		}
 		billService.update(bill);
-		workflowService.update(bill.getTaskId(), bill.getId(),bill.getMessage());
+		workflowService.update(bill.getTaskId(), bill.getId(),bill.getMessage(),(String)request.getSession().getAttribute("userName"));
 		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.bill.success", null, null));
 		return "redirect:/bill/result/" + bill.getId();
 	}
