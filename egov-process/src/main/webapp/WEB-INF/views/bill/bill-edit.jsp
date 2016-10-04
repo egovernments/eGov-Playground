@@ -3,7 +3,7 @@
 <form:form role="form" action="/egov-process/bill/update"
 	modelAttribute="bill" id="billform"
 	cssClass="form-horizontal form-groups-bordered"
-	enctype="multipart/form-data">
+	>
 	<%@ include file="bill-form.jsp"%>
 	<input type="hidden" name="bill" value="${bill.id}" />
 	</div>

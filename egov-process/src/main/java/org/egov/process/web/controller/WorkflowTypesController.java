@@ -1,7 +1,9 @@
 package org.egov.process.web.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.egov.process.entity.WorkflowTypes;
@@ -47,8 +49,24 @@ public class WorkflowTypesController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(@Valid @ModelAttribute final WorkflowTypes workflowTypes, final BindingResult errors,
-			final Model model, final RedirectAttributes redirectAttrs) {
+	public String create(@ModelAttribute final WorkflowTypes workflowTypes, final BindingResult errors,
+			final Model model, final RedirectAttributes redirectAttrs,HttpServletRequest request) {
+		System.err.println(request.getClass().getClassLoader().getClass().getSimpleName()+""+request.getClass().getSimpleName());
+		System.err.println(request.getParameterNames()+"########################44444444444444444444444444444");
+		
+		System.err.println(request.getParameterMap());
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		for(String s:parameterMap.keySet())
+		{
+		System.err.println(parameterMap.get(s));
+		for(String sss:parameterMap.get(s))
+		{
+			System.err.println(parameterMap.get(sss));
+		}
+		}  
+		
+		System.err.println("########################44444444444444444444444444444");
+		
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 			return WORKFLOWTYPES_NEW;
@@ -67,7 +85,7 @@ public class WorkflowTypesController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(@Valid @ModelAttribute final WorkflowTypes workflowTypes, final BindingResult errors,
+	public String update( @ModelAttribute final WorkflowTypes workflowTypes, final BindingResult errors,
 			final Model model, final RedirectAttributes redirectAttrs) {
 		if (errors.hasErrors()) {
 			prepareNewForm(model);

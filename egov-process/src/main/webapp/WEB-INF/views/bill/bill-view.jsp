@@ -45,18 +45,7 @@
 						<div class="col-sm-3 add-margin view-content">
 							${bill.billType}</div>
 					</div>
-					<div class="row add-border">
-						<div class="col-xs-3 add-margin">
-							<spring:message code="lbl.version" />
-						</div>
-						<div class="col-sm-3 add-margin view-content">
-							${bill.version}</div>
-						<div class="col-xs-3 add-margin">
-							<spring:message code="lbl.details" />
-						</div>
-						<div class="col-sm-3 add-margin view-content">
-							${bill.details}</div>
-					</div>
+					 
 				</div>
 			</div>
 		</div>

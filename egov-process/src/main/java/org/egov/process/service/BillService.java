@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.egov.process.entity.Bill;
+import org.egov.process.entity.BillDetails;
 import org.egov.process.repository.BillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,11 @@ public class BillService  {
 
 	@Transactional
 	public Bill create(final Bill bill) {
+		
+		for(BillDetails detail:bill.getDetails())
+		  {
+			  detail.setId(bill.getId());
+		  }
 		return billRepository.save(bill);
 	} 
 	@Transactional

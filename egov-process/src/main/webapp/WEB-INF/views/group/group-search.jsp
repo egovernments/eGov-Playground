@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
-<form:form role="form" action="search" modelAttribute="group" id="groupsearchform" cssClass="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+<form:form role="form" action="search" modelAttribute="group" id="groupsearchform" cssClass="form-horizontal form-groups-bordered" >
 <div class="main-content"><div class="row"><div class="col-md-12"><div class="panel panel-primary" data-collapsed="0"><div class="panel-heading"><div class="panel-title">SearchGroup</div></div><div class="panel-body"><div class="form-group">
 <label class="col-sm-3 control-label text-right"><spring:message code="lbl.name" />
 </label><div class="col-sm-3 add-margin">

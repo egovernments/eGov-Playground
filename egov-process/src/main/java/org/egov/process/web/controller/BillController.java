@@ -1,6 +1,8 @@
 package org.egov.process.web.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -9,6 +11,7 @@ import org.egov.process.service.BillService;
 import org.egov.process.service.DepartmentService;
 import org.egov.process.service.FundService;
 import org.egov.process.service.UserService;
+import org.egov.process.service.WorkflowService;
 import org.egov.process.web.adaptor.BillJsonAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -45,12 +48,17 @@ public class BillController {
 	private UserService userService;
 	@Autowired
 	private BillService billService;
+	@Autowired
+	private WorkflowService workflowService;	
+
 
 	private void prepareNewForm(Model model) {
 		model.addAttribute("funds", fundService.findAll());
 		model.addAttribute("departments", departmentService.findAll());
-		model.addAttribute("users", userService.findAll());
-		model.addAttribute("bills", billService.findAll());
+		Map billtypes=new LinkedHashMap<String,String>();
+		billtypes.put(Bill.BILL_TYPE_EXPENSE,Bill.BILL_TYPE_EXPENSE);
+		billtypes.put(Bill.BILL_TYPE_CONTRACTOR,Bill.BILL_TYPE_CONTRACTOR);
+		model.addAttribute("billtypes",billtypes );
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -68,6 +76,8 @@ public class BillController {
 			return BILL_NEW;
 		}
 		billService.create(bill);
+		bill.setMessage(bill.getBillNumber()+""+bill.getBillType()+""+bill.getBillAmount());
+		workflowService.initiate(bill.getClass().getName(), bill.getId(),bill.getMessage());
 		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.bill.success", null, null));
 		return "redirect:/bill/result/" + bill.getId();
 	}
@@ -88,6 +98,7 @@ public class BillController {
 			return BILL_EDIT;
 		}
 		billService.update(bill);
+		workflowService.update(bill.getTaskId(), bill.getId(),bill.getMessage());
 		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.bill.success", null, null));
 		return "redirect:/bill/result/" + bill.getId();
 	}

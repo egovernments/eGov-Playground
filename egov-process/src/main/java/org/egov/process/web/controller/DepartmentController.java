@@ -50,9 +50,11 @@ public class DepartmentController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(@ModelAttribute("processweb") final Department department, final BindingResult errors,
+	public String create(@ModelAttribute final Department department, final BindingResult errors,
 			final Model model, final RedirectAttributes redirectAttrs,HttpServletRequest request) {
 		//HttpServletRequest request=(HttpServletRequest)request1;
+		
+		System.err.println(request.getClass().getClassLoader().getClass().getSimpleName()+""+request.getClass().getSimpleName());
 		System.err.println(request.getParameterNames()+"########################3333333333333333333333");
 		
 		System.err.println(request.getParameterMap());

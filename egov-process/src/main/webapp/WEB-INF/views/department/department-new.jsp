@@ -9,7 +9,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <form:form role="form" action="create" modelAttribute="department" method="post"
 	name="departmentform" cssClass="form-horizontal form-groups-bordered"
-	enctype="multipart/form-data">
+	>
 	<div class="main-content">
 	<div class="row">
 		<div class="col-md-12">

@@ -1,9 +1,9 @@
+<%try{ %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
-<form:form role="form" action="create" modelAttribute="bill"
-	id="billform" cssClass="form-horizontal form-groups-bordered"
-	enctype="multipart/form-data">
-	<%@ include file="bill-form.jsp"%>
+<form:form role="form" action="create" modelAttribute="bill" method="post"
+	id="billform" cssClass="form-horizontal form-groups-bordered">
+	<%@ include file="bill-form.jsp" %>
 	</div>
 	</div>
 	</div>
@@ -28,3 +28,4 @@
 </script>
 <script type="text/javascript"
 	src="<c:url value='/resources/app/js/billHelper.js'/>"></script>
+<%}catch(Exception e){e.printStackTrace();}%>

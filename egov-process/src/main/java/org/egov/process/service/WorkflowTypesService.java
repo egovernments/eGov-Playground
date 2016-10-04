@@ -46,4 +46,9 @@ public WorkflowTypesService(final WorkflowTypesRepository workflowTypesRepositor
 	public List<WorkflowTypes> search(WorkflowTypes workflowTypes){
 	return workflowTypesRepository.findAll();
 	}
+
+	public WorkflowTypes findByClassName(String fullClassname) {
+		return workflowTypesRepository.findByClassName(fullClassname);
+		
+	}
 }

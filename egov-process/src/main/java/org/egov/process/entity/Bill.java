@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.Length;
@@ -26,6 +27,8 @@ import org.hibernate.validator.constraints.Length;
 @Table(name = "EG_BILL")
 @SequenceGenerator(name = Bill.SEQ, sequenceName = Bill.SEQ, allocationSize = 1)
 public class Bill {
+	public static final String BILL_TYPE_EXPENSE="Expense";
+	public static final String BILL_TYPE_CONTRACTOR="Contractor";
 	private static final long serialVersionUID = 1L;
 	static final String SEQ = "SEQ_BILL";
 
@@ -33,114 +36,133 @@ public class Bill {
 	@GeneratedValue(generator = SEQ, strategy = GenerationType.SEQUENCE)
 	private Long id;
 	
-	
 	@ManyToOne
 	@JoinColumn(name = "fundid")
 	private Fund fund;
-	
-	
 	@ManyToOne
 	@JoinColumn(name = "departmentid")
 	private Department department;
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public Fund getFund() {
-		return fund;
-	}
-	public void setFund(Fund fund) {
-		this.fund = fund;
-	}
-	public Department getDepartment() {
-		return department;
-	}
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
-	public String getBillNumber() {
-		return billNumber;
-	}
-	public void setBillNumber(String billNumber) {
-		this.billNumber = billNumber;
-	}
-	public Date getBillDate() {
-		return billDate;
-	}
-	public void setBillDate(Date billDate) {
-		this.billDate = billDate;
-	}
-	public BigDecimal getBillAmount() {
-		return billAmount;
-	}
-	public void setBillAmount(BigDecimal billAmount) {
-		this.billAmount = billAmount;
-	}
-	public User getCreatedBy() {
-		return createdBy;
-	}
-	public void setCreatedBy(User createdBy) {
-		this.createdBy = createdBy;
-	}
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-	public Date getLastModifiedDate() {
-		return lastModifiedDate;
-	}
-	public void setLastModifiedDate(Date lastModifiedDate) {
-		this.lastModifiedDate = lastModifiedDate;
-	}
-	public String getBillType() {
-		return billType;
-	}
-	public void setBillType(String billType) {
-		this.billType = billType;
-	}
-	public Long getVersion() {
-		return version;
-	}
-	public void setVersion(Long version) {
-		this.version = version;
-	}
-	public List<BillDetails> getDetails() {
-		return details;
-	}
-	public void setDetails(List<BillDetails> details) {
-		this.details = details;
-	}
-	
-	
 	@Length(max = 20)
 	private String billNumber;
-	
-	
 	private Date billDate;
- 
-	
 	private BigDecimal billAmount;
+	@Length(max = 20)
+	private String billType;
 
 	@ManyToOne
 	@JoinColumn(name="createdby")
 	private User createdBy;
-
 	private Date createdDate;
-
 	private Date lastModifiedDate;
-	
-	
-	private String billType;
 
+	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "bill", targetEntity = BillDetails.class)
+	private List<BillDetails> details;
+	
 	@Version
 	private Long version;
+	
+	//workflow related .. Can move to Stateware or some Abstract class 
+	@Transient
+	private String message;
+	@Transient
+	private String taskId;
+	
+	public BigDecimal getBillAmount() {
+		return billAmount;
+	}
+	public Date getBillDate() {
+		return billDate;
+	}
+	public String getBillNumber() {
+		return billNumber;
+	}
+	public String getBillType() {
+		return billType;
+	}
+	public User getCreatedBy() {
+		return createdBy;
+	}
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+	public Department getDepartment() {
+		return department;
+	}
+	public List<BillDetails> getDetails() {
+		return details;
+	}
+	public Fund getFund() {
+		return fund;
+	}
+	public Long getId() {
+		return id;
+	}
+	public Date getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public String getTaskId() {
+		return taskId;
+	}
+	public Long getVersion() {
+		return version;
+	}
+	public void setBillAmount(BigDecimal billAmount) {
+		this.billAmount = billAmount;
+	}
+	public void setBillDate(Date billDate) {
+		this.billDate = billDate;
+	}
+	public void setBillNumber(String billNumber) {
+		this.billNumber = billNumber;
+	}
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+	public void setCreatedBy(User createdBy) {
+		this.createdBy = createdBy;
+	}
+	
+	
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+	
+	
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+ 
+	
+	public void setDetails(List<BillDetails> details) {
+		this.details = details;
+	}
+
+	public void setFund(Fund fund) {
+		this.fund = fund;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setLastModifiedDate(Date lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
+	}
+	
+	
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
+	}
 	 
-	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "bill", targetEntity = BillDetails.class)
-	private List<BillDetails> details;
+	public void setVersion(Long version) {
+		this.version = version;
+	}
 
 }

@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository 
 public interface WorkflowTypesRepository extends JpaRepository<WorkflowTypes,java.lang.Long> {
 
+	WorkflowTypes findByClassName(String className);
+
+
 }

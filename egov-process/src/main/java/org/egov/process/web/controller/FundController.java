@@ -26,84 +26,84 @@ import com.google.gson.GsonBuilder;
 
 @Controller 
 @RequestMapping("/fund")
- public class FundController {
-private final static String FUND_NEW="fund-new";
-private final static String FUND_RESULT="fund-result";
-private final static String FUND_EDIT="fund-edit";
-private final static String FUND_VIEW="fund-view";
-private final static String FUND_SEARCH="fund-search";
-@Autowired
+public class FundController {
+	private final static String FUND_NEW="fund-new";
+	private final static String FUND_RESULT="fund-result";
+	private final static String FUND_EDIT="fund-edit";
+	private final static String FUND_VIEW="fund-view";
+	private final static String FUND_SEARCH="fund-search";
+	@Autowired
 	private  FundService fundService;
-@Autowired 
- private MessageSource messageSource;private void prepareNewForm(Model model) {
-}
+	@Autowired 
+	private MessageSource messageSource;private void prepareNewForm(Model model) {
+	}
 
-@RequestMapping(value = "/new", method = RequestMethod.GET)
+	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String newForm(final Model model){
-prepareNewForm(model);
-model.addAttribute("fund", new Fund() );
-	return FUND_NEW;
-}
+		prepareNewForm(model);
+		model.addAttribute("fund", new Fund() );
+		return FUND_NEW;
+	}
 
-@RequestMapping(value = "/create", method = RequestMethod.POST)
-	public String create(@Valid @ModelAttribute final Fund fund,final BindingResult errors,final Model model,final RedirectAttributes redirectAttrs){
-	if (errors.hasErrors()) {
-prepareNewForm(model);
-	return FUND_NEW; }
-fundService.create(fund);
-redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.fund.success",null,null));
-return "redirect:/fund/result/"+fund.getId();
-}
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public String create( @ModelAttribute final Fund fund,final BindingResult errors,final Model model,final RedirectAttributes redirectAttrs){
+		if (errors.hasErrors()) {
+			prepareNewForm(model);
+			return FUND_NEW; }
+		fundService.create(fund);
+		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.fund.success",null,null));
+		return "redirect:/fund/result/"+fund.getId();
+	}
 
-@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") final Long id,Model model){
-Fund fund  = fundService.findOne(id);prepareNewForm(model);
-model.addAttribute("fund", fund);	return FUND_EDIT;
-}
+		Fund fund  = fundService.findOne(id);prepareNewForm(model);
+		model.addAttribute("fund", fund);	return FUND_EDIT;
+	}
 
-@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(@Valid @ModelAttribute final Fund fund,final BindingResult errors,final Model model,final RedirectAttributes redirectAttrs){
-	if (errors.hasErrors()){
-prepareNewForm(model);return FUND_EDIT;
-}fundService.update(fund);
-redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.fund.success",null,null));
-return "redirect:/fund/result/"+fund.getId();
-}
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public String update( @ModelAttribute final Fund fund,final BindingResult errors,final Model model,final RedirectAttributes redirectAttrs){
+		if (errors.hasErrors()){
+			prepareNewForm(model);return FUND_EDIT;
+		}fundService.update(fund);
+		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.fund.success",null,null));
+		return "redirect:/fund/result/"+fund.getId();
+	}
 
-@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable("id") final Long id,Model model){
-Fund fund  = fundService.findOne(id);
-prepareNewForm(model);
-model.addAttribute("fund", fund);	return FUND_VIEW;
-}
+		Fund fund  = fundService.findOne(id);
+		prepareNewForm(model);
+		model.addAttribute("fund", fund);	return FUND_VIEW;
+	}
 
-@RequestMapping(value = "/result/{id}", method = RequestMethod.GET)
- public String result(@PathVariable("id") final Long id,Model model){
-Fund fund  = fundService.findOne(id);model.addAttribute("fund", fund);
-return FUND_RESULT;}
+	@RequestMapping(value = "/result/{id}", method = RequestMethod.GET)
+	public String result(@PathVariable("id") final Long id,Model model){
+		Fund fund  = fundService.findOne(id);model.addAttribute("fund", fund);
+		return FUND_RESULT;}
 
-@RequestMapping(value =  "/search/{mode}", method = RequestMethod.GET)
-public String search(@PathVariable("mode") final String  mode,Model model)
-{
-Fund fund  = new Fund();
-prepareNewForm(model);
-model.addAttribute("fund",fund);
-return FUND_SEARCH;
+	@RequestMapping(value =  "/search/{mode}", method = RequestMethod.GET)
+	public String search(@PathVariable("mode") final String  mode,Model model)
+	{
+		Fund fund  = new Fund();
+		prepareNewForm(model);
+		model.addAttribute("fund",fund);
+		return FUND_SEARCH;
 
-}
+	}
 
-@RequestMapping(value = "/ajaxsearch/{mode}", method = RequestMethod.POST,produces = MediaType.TEXT_PLAIN_VALUE)
-public @ResponseBody String ajaxsearch(@PathVariable("mode") final String mode, Model model,@ModelAttribute final Fund fund ) 
-{
-List<Fund> searchResultList = fundService.search(fund);
-String result = new StringBuilder("{ \"data\":").append(toSearchResultJson(searchResultList)).append("}").toString();
-return result;
-}
-public Object toSearchResultJson(final Object object)
- {
-final GsonBuilder gsonBuilder = new GsonBuilder();
-final Gson gson = gsonBuilder.registerTypeAdapter(Fund.class,new FundJsonAdaptor()).create();
-final String json = gson.toJson(object);
-return json;
-}
+	@RequestMapping(value = "/ajaxsearch/{mode}", method = RequestMethod.POST,produces = MediaType.TEXT_PLAIN_VALUE)
+	public @ResponseBody String ajaxsearch(@PathVariable("mode") final String mode, Model model,@ModelAttribute final Fund fund ) 
+	{
+		List<Fund> searchResultList = fundService.search(fund);
+		String result = new StringBuilder("{ \"data\":").append(toSearchResultJson(searchResultList)).append("}").toString();
+		return result;
+	}
+	public Object toSearchResultJson(final Object object)
+	{
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		final Gson gson = gsonBuilder.registerTypeAdapter(Fund.class,new FundJsonAdaptor()).create();
+		final String json = gson.toJson(object);
+		return json;
+	}
 }

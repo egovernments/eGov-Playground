@@ -15,11 +15,9 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:options items="${funds}" itemValue="id" itemLabel="name" />
+							 <form:options items="${funds}" itemValue="id"
+									itemLabel="name" />
 							</form:select>
-							<form:input path="fund"
-								class="form-control text-right patternvalidation"
-								data-pattern="number" />
 							<form:errors path="fund" cssClass="error-msg" />
 						</div>
 						<label class="col-sm-3 control-label text-right"><spring:message
@@ -33,9 +31,7 @@
 								<form:options items="${departments}" itemValue="id"
 									itemLabel="name" />
 							</form:select>
-							<form:input path="department"
-								class="form-control text-right patternvalidation"
-								data-pattern="number" />
+							 
 							<form:errors path="department" cssClass="error-msg" />
 						</div>
 					</div>
@@ -68,20 +64,16 @@
 						<label class="col-sm-3 control-label text-right"><spring:message
 								code="lbl.billtype" /> </label>
 						<div class="col-sm-3 add-margin">
-							<form:input path="billType"
-								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="0" />
+							<form:select path="billType" id="billType"
+								cssClass="form-control" cssErrorClass="form-control error">
+								<form:option value="">
+									<spring:message code="lbl.select" />
+								</form:option>
+								<form:options items="${billtypes}"/>
+							</form:select>
 							<form:errors path="billType" cssClass="error-msg" />
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="col-sm-3 control-label text-right"><spring:message
-								code="lbl.version" /> </label>
-						<div class="col-sm-3 add-margin">
-							<form:input path="version"
-								class="form-control text-right patternvalidation"
-								data-pattern="number" />
-							<form:errors path="version" cssClass="error-msg" />
-						</div>
-						<input type="hidden" name="bill" value="${bill.id}" />
-						<%@ include file="../billdetails/billdetails-formtable.jsp"%>
+					 <%@include file="../billdetails/billdetails-formtable.jsp" %>
+						 
+					
