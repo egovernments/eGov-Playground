@@ -220,6 +220,10 @@
 	<put-attribute name="body" value="/WEB-INF/views/inbox/inbox-search.jsp"/>
 </definition>
 
+<definition name="inbox-frame" template="/WEB-INF/views/inbox/inbox-frame.jsp"/>
+	
+
+
 
 
 </tiles-definitions>

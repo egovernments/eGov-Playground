@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="/bill/edit/:objectId/:taskId">
   <process id="expense_bill" name="expense_bill" isExecutable="true">
     <documentation>bill</documentation>
     <startEvent id="startEvent1"></startEvent>
-    <userTask id="sid-2488E025-A0CF-4413-8935-3B84693D84DC" name="Verify Bill" activiti:assignee="kavya">
+    <userTask id="sid-2488E025-A0CF-4413-8935-3B84693D84DC" name="Verify Bill" activiti:assignee="kavya" activiti:category="/bill/edit/:objectId/:taskId">
       <extensionElements>
         <modeler:activiti-idm-assignee xmlns:modeler="http://activiti.com/modeler">true</modeler:activiti-idm-assignee>
         <modeler:assignee-info-email xmlns:modeler="http://activiti.com/modeler">kavya.ys@egovernments.org</modeler:assignee-info-email>
@@ -13,7 +13,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-186A8B8A-8137-4781-BEDF-2F8E353F1283" sourceRef="startEvent1" targetRef="sid-2488E025-A0CF-4413-8935-3B84693D84DC"></sequenceFlow>
-    <userTask id="sid-6B2F8C9C-F0DA-4000-86A4-9C703EDDEFA7" name="Approve Expense Bill" activiti:assignee="venki">
+    <userTask id="sid-6B2F8C9C-F0DA-4000-86A4-9C703EDDEFA7" name="Approve Expense Bill" activiti:assignee="venki" activiti:category="/bill/view/:objectId/:taskId">
       <extensionElements>
         <modeler:activiti-idm-assignee xmlns:modeler="http://activiti.com/modeler">true</modeler:activiti-idm-assignee>
         <modeler:assignee-info-email xmlns:modeler="http://activiti.com/modeler">venki@egovernments.org</modeler:assignee-info-email>

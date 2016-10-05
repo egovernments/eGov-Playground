@@ -34,26 +34,26 @@ public class InboxController {
 	@Autowired
 	private IdentityService iservice;
 	
-	@RequestMapping(value = "/login/{userName}", method = RequestMethod.GET,produces = MediaType.TEXT_PLAIN_VALUE)
-    public @ResponseBody String  login(@PathVariable String userName,HttpServletRequest request)
+	@RequestMapping(value = "/login/{userName}", method = RequestMethod.GET)
+    public String   login(@PathVariable String userName,HttpServletRequest request)
     {
 		User user = iservice.createUserQuery().userId(userName).singleResult();
 		if(user.getId()!=null)
 		{
 		request.getSession().setAttribute("userName", user.getFirstName());
-	      return	"Success";
+		return	"inbox-frame";
 		}
 		else
-			return "User does not Exist! Cannot login";
+			return	"inbox-frame";
 			
     }
 	
-	@RequestMapping(value = "/logout/", method = RequestMethod.GET,produces = MediaType.TEXT_PLAIN_VALUE) 
-    public @ResponseBody String  logout(HttpServletRequest request)
+	@RequestMapping(value = "/logout/", method = RequestMethod.GET ) 
+    public  String  logout(HttpServletRequest request)
     {
 		
 		request.getSession().removeAttribute("userName");
-		return	"Successfull Logged Out";
+		return	"inbox-frame";
     }
 	
 	@RequestMapping(value =  "inbox", method = RequestMethod.GET)

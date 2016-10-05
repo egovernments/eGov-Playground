@@ -1,0 +1,17 @@
+<html>
+<UL><li>
+<input type="button" onclick="newopen('http://localhost:8180/egov-process/bill/new')" value="Create New Bill"/>
+</li>
+<li>
+<a href="http://localhost:8180/egov-process/bill/search/view">View Bills</a>
+</li>
+</UL>
+<script>
+function newopen(src)
+{
+	console.log(src);
+   window.open(src,"egov",'width=800, height=600');
+}
+
+</script>
+</html>

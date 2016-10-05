@@ -133,7 +133,9 @@ public class WorkflowService  {
 		variables.put("objectId", id);
 		ProcessInstance processInstance = runtimeService
 				.startProcessInstanceByKey(workflowType.getBusinessKey(),variables);
-		  System.out.println("Worflow Started .Instance id"+processInstance.getId());
+		 processInstance.getProcessVariables();
+		
+		  System.out.println("Worflow Started .Instance id"+processInstance.getId()+""+processInstance.getProcessVariables());
 		
 		return true;
 	}
@@ -144,9 +146,6 @@ public class WorkflowService  {
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		//verify
 		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put("description", message);
-		variables.put("sender", sender);
-		variables.put("objectId", id.toString());
 		taskService.addComment(task.getId(), task.getProcessInstanceId(), message);
 		taskService.complete(task.getId(),variables);
 		return true;
