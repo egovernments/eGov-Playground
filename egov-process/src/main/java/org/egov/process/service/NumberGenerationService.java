@@ -1,24 +1,21 @@
 package org.egov.process.service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.egov.process.entity.Bill;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class NumberGenerationService  {
@@ -34,6 +31,8 @@ public class NumberGenerationService  {
 	@Autowired
 	private IdentityService iservice;
 
+	@Autowired
+	private BillService billService;
 	 
 	public String start(String message,String bpmnkey) {
 		if(bpmnkey.contains("Mail"))
@@ -106,11 +105,28 @@ public class NumberGenerationService  {
 
 	}
 	
-	public void print(DelegateExecution execution)  {
-	    String var = (String) execution.getVariable("input");
-	    var = var.toUpperCase();
-	    execution.setVariable("input", var);
-	  }
+	public void genNumber(DelegateExecution execution) {
+		System.err.println("Updating bill number.......................................");
+		Map<String, Object> variables = runtimeService.getVariables(execution.getProcessInstanceId());
+		Long id = null;
+		if (variables != null && variables.get("objectId") != null) {
+			Object object = variables.get("objectId");
+			try {
+				id = Long.valueOf(object.toString());
+				Bill bill = billService.findOne(id);
+				System.out.println(bill.getFund().getCode()+ bill.getBillNumber());
+				bill.setBillNumber(bill.getFund().getCode()+ bill.getBillNumber());
+				billService.update(bill);
+
+			} catch (Exception e) {
+				System.out.println("error bill number.......................................");
+				throw new RuntimeException("cant Generate Number for bill ");
+
+			}
+
+
+		}
+	}
 	
 	public void print()  {
 	   System.out.println("printing.......................................");

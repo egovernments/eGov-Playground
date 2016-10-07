@@ -3,8 +3,16 @@
 <input type="button" onclick="newopen('http://localhost:8180/egov-process/bill/new')" value="Create New Bill"/>
 </li>
 <li>
-<a href="http://localhost:8180/egov-process/bill/search/view">View Bills</a>
+    <input type="button" onclick="newopen('http://localhost:8180/egov-process/bill/search/view')" value="View Bills"/>
 </li>
+    <li>
+        <input type="button" onclick="newopen('http://localhost:8180/egov-process/workflowtypes/new')" value="Add Workflow Objects"/>
+    </li>
+
+    <li>
+        <input type="button" onclick="newopen('http://localhost:8180/egov-process/workflowtypes/search/edit')" value="Edit Workflow Objects"/>
+    </li>
+
 </UL>
 <script>
 function newopen(src)

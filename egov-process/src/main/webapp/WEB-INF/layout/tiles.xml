@@ -200,6 +200,11 @@
 	<put-attribute name="body" value="/WEB-INF/views/bill/bill-view.jsp"/>
 </definition>
 
+	<definition name="bill-wf-view" extends="base_layout">
+		<put-attribute name="page-title" value="title.bill.view" cascade="true"/>
+		<put-attribute name="body" value="/WEB-INF/views/bill/bill-wf-view.jsp"/>
+	</definition>
+
 <definition name="bill-edit" extends="base_layout">
 	<put-attribute name="page-title" value="title.bill.edit" cascade="true"/>
 	<put-attribute name="body" value="/WEB-INF/views/bill/bill-edit.jsp"/>

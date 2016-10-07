@@ -17,8 +17,7 @@ function callAjaxSearch() {
 							'click',
 							function() {
 								console.log(data.id);
-								window.open('/egov-process/bill/processwf/'
-										+ data.id + '/' + data.taskId, '',
+								window.open('/egov-process/'+data.link, '',
 										'width=800, height=600');
 							});
 				},

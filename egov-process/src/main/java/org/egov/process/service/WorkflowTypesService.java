@@ -1,19 +1,16 @@
 package org.egov.process.service;
 
 
-import java.util.List;
-
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.egov.process.entity.WorkflowTypes;
 import org.egov.process.repository.WorkflowTypesRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.List;
 
 
 @Service 
@@ -50,5 +47,9 @@ public WorkflowTypesService(final WorkflowTypesRepository workflowTypesRepositor
 	public WorkflowTypes findByClassName(String fullClassname) {
 		return workflowTypesRepository.findByClassName(fullClassname);
 		
+	}
+	public WorkflowTypes findByClassNameAnType(String fullClassname,String type) {
+		return workflowTypesRepository.findByClassNameAndType(fullClassname,type);
+
 	}
 }

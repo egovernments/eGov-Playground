@@ -1,18 +1,9 @@
 package org.egov.process.web.controller;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.egov.process.entity.Bill;
-import org.egov.process.service.BillService;
-import org.egov.process.service.DepartmentService;
-import org.egov.process.service.FundService;
-import org.egov.process.service.UserService;
-import org.egov.process.service.WorkflowService;
+import org.egov.process.service.*;
 import org.egov.process.web.adaptor.BillJsonAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -20,15 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/bill")
@@ -37,6 +27,7 @@ public class BillController {
 	private final static String BILL_RESULT = "bill-result";
 	private final static String BILL_EDIT = "bill-edit";
 	private final static String BILL_VIEW = "bill-view";
+	private final static String BILL_WF_VIEW = "bill-wf-view";
 	private final static String BILL_SEARCH = "bill-search";
 
 	@Autowired
@@ -59,6 +50,9 @@ public class BillController {
 		Map billtypes=new LinkedHashMap<String,String>();
 		billtypes.put(Bill.BILL_TYPE_EXPENSE,Bill.BILL_TYPE_EXPENSE);
 		billtypes.put(Bill.BILL_TYPE_CONTRACTOR,Bill.BILL_TYPE_CONTRACTOR);
+		billtypes.put(Bill.BILL_TYPE_SUPPLIER,Bill.BILL_TYPE_SUPPLIER);
+		billtypes.put(Bill.BILL_TYPE_SALARY,Bill.BILL_TYPE_SALARY);
+		billtypes.put(Bill.BILL_TYPE_PENSION,Bill.BILL_TYPE_PENSION);
 		model.addAttribute("billtypes",billtypes );
 	}
 
@@ -78,18 +72,26 @@ public class BillController {
 		}
 		billService.create(bill);
 		bill.setMessage(bill.getBillNumber()+""+bill.getBillType()+""+bill.getBillAmount());
-		workflowService.initiate(bill.getClass().getName(), bill.getId(),bill.getMessage());
+		workflowService.initiate(bill.getClass().getName(), bill.getId(),bill.getMessage(),bill.getBillType());
 		redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.bill.success", null, null));
 		return "redirect:/bill/result/" + bill.getId();
 	}
 
-	@RequestMapping(value = "/processwf/{id}/{taskId}", method = RequestMethod.GET)
-	public String edit(@PathVariable("id") final Long id,@PathVariable("taskId") final String taskId, Model model) {
+	@RequestMapping(value = "/workflow/edit/{id}/{taskId}", method = RequestMethod.GET)
+	public String workflowEdit(@PathVariable("id") final Long id,@PathVariable("taskId") final String taskId, Model model) {
 		Bill bill = billService.findOne(id);
 		bill.setTaskId(taskId);
 		prepareNewForm(model);
 		model.addAttribute("bill", bill);
 		return BILL_EDIT;
+	}
+	@RequestMapping(value = "/workflow/view/{id}/{taskId}", method = RequestMethod.GET)
+	public String workflowView(@PathVariable("id") final Long id,@PathVariable("taskId") final String taskId, Model model) {
+		Bill bill = billService.findOne(id);
+		bill.setTaskId(taskId);
+		prepareNewForm(model);
+		model.addAttribute("bill", bill);
+		return BILL_WF_VIEW;
 	}
 	
 	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)

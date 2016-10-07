@@ -1,25 +1,22 @@
 package org.egov.process.service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.egov.process.entity.Bill;
 import org.egov.process.entity.WorkflowTypes;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class WorkflowService  {
@@ -36,6 +33,9 @@ public class WorkflowService  {
 	private IdentityService iservice;
 	@Autowired
 	private WorkflowTypesService workflowTypesService;
+
+	@Autowired
+	private BillService billService;
 
 	 
 	public String start(String message,String bpmnkey) {
@@ -119,9 +119,14 @@ public class WorkflowService  {
 	   System.out.println("printing.......................................");
 	  }
 	
-	public boolean initiate(String fullClassname ,Long id,String message)
+	public boolean initiate(String fullClassname ,Long id,String message,String type)
+
 	{
-		WorkflowTypes workflowType = workflowTypesService.findByClassName(fullClassname);
+		WorkflowTypes workflowType =null;
+		if(type!=null && !type.isEmpty())
+		 workflowType = workflowTypesService.findByClassNameAnType(fullClassname,type);
+		else
+			workflowType = workflowTypesService.findByClassName(fullClassname);
 		if(null==workflowType ||null==workflowType.getBusinessKey())
 		{
 			  System.out.println("BPMN key is empty cant start workflow.");
@@ -139,15 +144,20 @@ public class WorkflowService  {
 		
 		return true;
 	}
-	
+	@Transactional
 	public boolean update(String taskId,Long id,String message,String sender)
 	{
-		
+
+	Bill bill=	billService.findOne(id);
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 		//verify
 		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("wfObject",bill);
+		variables.put("billAmount",bill.getBillAmount());
 		taskService.addComment(task.getId(), task.getProcessInstanceId(), message);
+
 		taskService.complete(task.getId(),variables);
+
 		return true;
 	}
 

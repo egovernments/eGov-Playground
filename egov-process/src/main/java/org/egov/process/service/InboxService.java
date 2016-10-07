@@ -1,27 +1,19 @@
 package org.egov.process.service;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.egov.process.entity.Inbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,9 +45,11 @@ public class InboxService {
 				item.setNatureOfWork(t.getName());
 				
 				item.setDetails(getDescription(t));
-				item.setId(getObjectId(t));
+				item.setId(getObjectId(t));;
+
+				item.setLink(getLink(t,item.getId()));
 				items.add(item);
-				item.setLink(getLink(t));
+
 			}
 			item = new Inbox();
 			item.setSender("Sample Sender");
@@ -75,7 +69,7 @@ public class InboxService {
 	private Long getObjectId(Task t) {
         Long id=null;
 		Map<String, Object> variables = runtimeService.getVariables(t.getProcessInstanceId());
-		
+
 		if(variables!=null && variables.get("objectId")!=null)
 		{
 			 Object object = variables.get("objectId");
@@ -83,14 +77,14 @@ public class InboxService {
 				id= Long.valueOf(object.toString());
 			 }catch(Exception e)
 			 {
-				 
+
 			 }
-			 
-			
-			  
+
+
+
 		}
 		return id;
-		
+
 
 	}
 
@@ -106,14 +100,23 @@ public class InboxService {
 		 return "";
 	}
 
-	private String getLink(Task t) {
+	private String getLink(Task t,Long objectId) {
+		String link="";
 		if (t.getCategory() != null)
-			return t.getCategory();
+			link= t.getCategory();
 		else {
 			ProcessDefinition processDefinition = processEngine.getRepositoryService().createProcessDefinitionQuery()
 					.processDefinitionId(t.getProcessDefinitionId()).singleResult();
-			return processDefinition.getCategory();
+			link= processDefinition.getCategory();
 		}
+		if(link!=null && !link.isEmpty())
+		{
+			if(link.indexOf(":objectId")!=-1)
+			link=link.replace(":objectId",objectId.toString());
+			if(link.indexOf(":taskId")!=-1)
+			link=link.replace(":taskId",t.getId());
+		}
+		return link;
 
 	}
 
