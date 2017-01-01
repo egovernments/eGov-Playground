@@ -161,6 +161,7 @@
 								<form:hidden path="crossHierarchyId" id="crosshierarchyId" data-api-key="crosshierarchyId"/>
 								<form:hidden path="lat" id="lat" data-api-key="lat"/>
                    				<form:hidden path="lng" id="lng" data-api-key="lng"/>
+                   				<form:hidden path="" id="userId" value = "${userId}" data-api-key="requester_id"/>
 							</div>
 							<form:errors path="location" cssClass="add-margin error-msg"/>
 							<form:hidden path="latlngAddress" id="latlngaddress" data-api-key="latlngaddress"/>

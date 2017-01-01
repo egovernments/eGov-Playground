@@ -114,11 +114,28 @@ jQuery(document).ready(function($)
 	});
 
 	$('#create-griev').click(function() {
-		console.log(prepareRequest())
+//		var token = sessionStorage.getItem("token");
+//		$.ajax
+//		({
+//		  type: "GET",
+//		  url: "http://localhost:8090/pgrrest/users/_login?jurisdiction_id=ap.test",
+//		  dataType: 'json',
+//		  async: false,
+//		  headers: {
+//			"Content-Type" : "application/x-www-form-urlencoded",  
+//		    "Authorization": "Basic " + btoa("egov-pgrrest" + ":" + "egov-pgrrest")
+//		  },
+//		  data: '{ "comment" }',
+//		  success: function (){
+//		    alert('Thanks for your comment!'); 
+//		  }
+//		});
+		
 		$.ajax({
 			type: "POST",
 			contentType: "application/json",
-			url: "http://localhost:8090/pgr/requests?jurisdictionId=ap.localhost",
+			url: "http://localhost:8090/pgrrest/a1/requests?jurisdiction_id=ap.test",
+			processData: false,
 			data:JSON.stringify(prepareRequest()),
 			success : function(response) {
 				console.log("success"+response );
@@ -136,23 +153,32 @@ jQuery(document).ready(function($)
 		});
 	});
 
-	function prepareRequest(){
+	function prepareRequest(type){
 		var params={};
 		$('form *[data-api-key]').each(function() {
 			params[$(this).attr('data-api-key')]=$(this).val();
-			console.log($(this).attr('data-api-key')+'<---->'+$(this).val());
 		});
+		
+		//Format Date
+		var date = new Date();
+		var day = date.getDay()+1;
+		var month = date.getMonth()+1;
+		var year = date.getFullYear();
+		var hours = date.getHours();
+		var minitues = date.getMinutes();
+		var seconds = date.getSeconds();
+		var currentDate = day+'-'+month+'-'+year;
 
 		//Build attributes array
 		var RequestInfo = {};
 		RequestInfo.api_id = "org.egov.pgr";
 		RequestInfo.ver = "1.0";
-		RequestInfo.ts = "2016-12-24";
+		RequestInfo.ts = currentDate;
 		RequestInfo.action = "POST";
 		RequestInfo.did = "4354648646";
 		RequestInfo.key = "XYZ";
 		RequestInfo.msg_id = "654654";
-		RequestInfo.requester_id = "61";
+		RequestInfo.requester_id = params['requester_id'];
 		RequestInfo.auth_token = "byrfyrfieruiuirugiergh";
 
 		var ServiceRequest = {};
@@ -164,91 +190,34 @@ jQuery(document).ready(function($)
 		ServiceRequest.service_code = params["service_code"];
 		ServiceRequest.address_id = params["crosshierarchyId"];
 		ServiceRequest.status = true;
-		ServiceRequest.requested_datetime = new Date();
+		ServiceRequest.requested_datetime = "";
+		if(type === 'ANONYMOUS'){
+			ServiceRequest.first_name = params["first_name"];
+			ServiceRequest.phone = params["mobile"];
+			ServiceRequest.email = params["email"];
+		}
 
 		var request = {};
 		request.RequestInfo = RequestInfo;
 		request.ServiceRequest = ServiceRequest;
 
 		return request;
-
-//		var attributes = [];
-//		var jsonObject = {};
-//		jsonObject.first_name = params["first_name"];
-//		jsonObject.last_name = "";
-//		jsonObject.email = params['email'];
-//		jsonObject.phone= params['phone'];
-//		jsonObject.requester_address = params['requester_address'];
-//		jsonObject.description = params['description'];
-//		jsonObject.lat = params['lat'];
-//		jsonObject.long = params['lng'];
-//		jsonObject.address = params['address'];
-//		if($('#file1')[0].files.length > 0)
-//		jsonObject.media_url = $('#file1')[0].files[0];
-//		if($('#file2')[0].files.length > 0)
-//		jsonObject.push("media_url", $('#file2')[0].files[0]);
-//		if($('#file3')[0].files.length > 0)
-//		jsonObject.push("media_url", $('#file3')[0].files[0]);
-
-//		attributes.push("attribute",jsonObject)
-
-//		var formData = new FormData();
-//		formData.append("jurisdiction_id",1016);
-//		formData.append("service_code",params["service_code"]);
-//		formData.append("location",params["crosshierarchyId"]);
-//		formData.append("attributes",JSON.stringify(attributes));
-
-//		formData.append("complaintJSON", JSON.stringify(params));
-//		if($('#file1')[0].files.length > 0)
-//		formData.append("files", $('#file1')[0].files[0]);
-//		if($('#file2')[0].files.length > 0)
-//		formData.append("files", $('#file2')[0].files[0]);
-//		if($('#file3')[0].files.length > 0)
-//		formData.append("files", $('#file3')[0].files[0]);
-
-//		return formData;
 	}
 
 
-
-
-
-
-
 	$('#create-anonymous-grievance').click(function() {
-//		var params={};
-//		$('form *[data-api-key]').each(function() {
-//		params[$(this).attr('data-api-key')]=$(this).val();
-//		});
-//		var formData = new FormData();
-//		formData.append("complaintJSON", JSON.stringify(params));
-//		if($('#file1')[0].files.length > 0)
-//		formData.append("files", $('#file1')[0].files[0]);
-//		if($('#file2')[0].files.length > 0)
-//		formData.append("files", $('#file2')[0].files[0]);
-//		if($('#file3')[0].files.length > 0)
-//		formData.append("files", $('#file3')[0].files[0]);
 
 		$.ajax({
 			type: "POST",
-			url: "http://172.16.2.230:8080/pgrrest/anonymous/complaint/create",
-			cache: false,
-			contentType: false,
-			processData: false,
-			data: prepareRequest(),
+			contentType: "application/json",
+			url: "http://localhost:8090/pgrrest/a1/requests?jurisdiction_id=ap.test",
+			data:JSON.stringify(prepareRequest('ANONYMOUS')),
 			success : function(response) {
-				var jsonObject = JSON.parse(response);
-				$.each(jsonObject.result,function(key,val){
+				$.each(response.ServiceRequests[0],function(key,val){
 					$('div[data-api-key='+key+']').html(val);
 				});
-				$('div[data-api-key=location]').html(jsonObject.result.childLocationName +"-"+ jsonObject.result.locationName);
-
-				$.each(jsonObject.result.supportDocs,function(key,val){
-					/*$('#links').append('<a href="../downloadfile/'+val.fileId+'"> <img class="img-width add-margin" '+
-							'src="../downloadfile/'+val.fileId+'" /></a>');*/
-
-					$('#links').append('<a href="" onclick="window.open(\'http://172.16.2.230:8080/pgrrest0/downloadfile?fileStoreId='+val.fileId+',\',\'height=600,width=1200,scrollbars=yes,left=0,top=0,status=yes\')">Hi</a>');
-				});
+				
+				$('div[data-api-key="location"]').html(response.ServiceRequests[0].values[0].values);
 				$('#success').show();
 				$('#registration').hide();
 			},

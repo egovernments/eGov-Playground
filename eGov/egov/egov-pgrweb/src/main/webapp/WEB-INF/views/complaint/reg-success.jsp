@@ -48,7 +48,7 @@
 			<div class="panel-heading">
 				<div class="panel-title text-center no-float">
 					<strong><spring:message code="msg.complaint.reg.success"/></strong>
-					<div><spring:message code="lbl.complaint.reg.no"/>(<spring:message code="lbl.crn"/>) : <div data-api-key = "crn"></div><span id="ctn_no"><strong>${complaint.crn}</strong></span>.<spring:message code="msg.crn.info"/></div>
+					<div><spring:message code="lbl.complaint.reg.no"/>(<spring:message code="lbl.crn"/>) : <div data-api-key = "service_request_id"></div><span id="ctn_no"><strong>${complaint.crn}</strong></span>.<spring:message code="msg.crn.info"/></div>
 				</div>
 			</div>
 			<div class="panel-body">
@@ -56,14 +56,14 @@
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.complaintDate"/>
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-date" data-api-key="createdDate">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-date" data-api-key="requested_datetime">
 						<fmt:formatDate value="${complaint.createdDate}" pattern="dd-MM-yyyy hh:mm:ss" var="complaintDate"/>
 						${complaintDate}
 					</div>
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.complainant.name"/>
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-name" data-api-key="complainantName">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-name" data-api-key="first_name">
 						<c:choose>
 							<c:when test="${not empty complaint.complainant.name}">
 							${complaint.complainant.name}
@@ -79,13 +79,13 @@
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.phoneNumber" />
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno" data-api-key="complainantMobile">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno" data-api-key="phone">
 						${complaint.complainant.mobile}
 					</div>
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.email"/>
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email" data-api-key="complainantEmail">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email" data-api-key="email">
 						${complaint.complainant.email}
 					</div>
 				</div>
@@ -120,13 +120,13 @@
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.complaintType"/>
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-type" data-api-key="complaintTypeName">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-type" data-api-key="service_name">
 						${complaint.complaintType.name}
 					</div>
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.compDetails"/>
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-details" data-api-key="detail">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-details" data-api-key="description">
 						${complaint.details}
 					</div>
 				</div>
@@ -143,7 +143,7 @@
 					<div class="col-md-3 col-xs-6 add-margin">
 						<spring:message code="lbl.landmark"/>
 					</div>
-					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-landmark" data-api-key="landmarkDetails">
+					<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-landmark" data-api-key="address">
 						${complaint.landmarkDetails}
 					</div>
 				</div>

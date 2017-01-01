@@ -42,7 +42,9 @@ package org.egov.pgr.web.controller.complaint.citizen;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.infra.admin.master.entity.CrossHierarchy;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.security.utils.RecaptchaUtils;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.pgr.entity.Complaint;
 import org.egov.pgr.utils.constants.PGRConstants;
 import org.egov.pgr.web.controller.complaint.GenericComplaintController;
@@ -71,12 +73,14 @@ public class CitizenComplaintRegistrationController extends GenericComplaintCont
     private RecaptchaUtils recaptchaUtils;
 
     @RequestMapping(value = "show-reg-form", method = GET)
-    public String showComplaintRegistrationForm(@ModelAttribute final Complaint complaint) {
+    public String showComplaintRegistrationForm(@ModelAttribute final Complaint complaint,final Model model) {
+    	model.addAttribute("userId", ApplicationThreadLocals.getUserId());
         return "complaint/citizen/registration-form";
     }
 
     @RequestMapping(value = "anonymous/show-reg-form", method = GET)
-    public String showAnonymousComplaintRegistrationForm(@ModelAttribute final Complaint complaint) {
+    public String showAnonymousComplaintRegistrationForm(@ModelAttribute final Complaint complaint,final Model model) {
+    	model.addAttribute("userId", ApplicationThreadLocals.getUserId());
         return "complaint/citizen/anonymous-registration-form";
     }
 
