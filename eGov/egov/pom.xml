@@ -244,7 +244,7 @@
         <module>egov-commons</module>
         <module>egov-pgr</module>
         <module>egov-portal</module>
-        <module>egov-database</module>
+        <!-- <module>egov-database</module> -->
         <module>egov-pgrweb</module>
         <module>egov-portalweb</module>
         <module>egov-eisweb</module>
