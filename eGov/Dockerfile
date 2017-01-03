@@ -1,16 +1,23 @@
-FROM openjdk:8-jdk
+FROM egov-jboss:latest
 
 MAINTAINER Sonny Garcia <sonnygarcia@icloud.com>
 
-# install maven
-ENV MAVEN_VERSION 3.3.9
-RUN curl -O http://www-us.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
- && tar xzf apache-maven-$MAVEN_VERSION-bin.tar.gz -C /usr/local/lib
-ENV PATH $PATH:/usr/local/lib/apache-maven-$MAVEN_VERSION/bin
-
 # copy src code into image
-COPY . /usr/local/src/eGov
+COPY egov /usr/local/src/egov
 
-# build out all of the egov-*.jar files
-RUN cd /usr/local/src/eGov/egov \
- && mvn clean package -DskipTests
+# set the context for the rest of the cmds
+WORKDIR /usr/local/src/egov
+
+# build artifacts using maven
+RUN mvn package -DskipTests
+
+# deploy application into jboss
+RUN DEPLOY_DIR=$JBOSS_HOME/standalone/deployments \
+ && cp egov-ear/target/egov-ear-*-SNAPSHOT.ear $DEPLOY_DIR \
+ && cd $DEPLOY_DIR \
+ && touch $(ls egov-ear-*-SNAPSHOT.ear).dodeploy
+
+# NOTE: the two 'RUN' commands can probably be combined inside of a single
+# script (i.e. RUN build-and-install-app.sh) so that we can also clean up the
+# extra files created during the `mvn package' command. that step inflates the
+# resultant image by almost 1.0GB.
