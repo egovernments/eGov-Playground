@@ -67,7 +67,7 @@ public class NotificationController {
 	@Autowired
 	private MessagingService messagingService;
 	private ResponseInfo resInfo = null;
-
+	
 	@RequestMapping(value = "/sms", method = RequestMethod.POST)
 	public ResponseInfo sms(@RequestParam(value = "mobile_no", required = true) String mobile_no,
 			@RequestParam(value = "message", required = true) String message, @RequestBody RequestInfo request)

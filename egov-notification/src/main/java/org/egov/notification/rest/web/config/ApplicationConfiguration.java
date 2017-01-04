@@ -40,18 +40,12 @@
 
 package org.egov.notification.rest.web.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.Resource;
-
 import org.egov.notification.rest.web.config.properties.ApplicationProperties;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
