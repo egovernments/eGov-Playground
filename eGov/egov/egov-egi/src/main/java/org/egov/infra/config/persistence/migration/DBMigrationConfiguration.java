@@ -104,7 +104,7 @@ public class DBMigrationConfiguration {
         flyway.setLocations(locations);
         flyway.setDataSource(dataSource);
         flyway.setSchemas(schema);
-//        flyway.migrate();
+        flyway.migrate();
     }
 
     @Bean(name = "tenants", autowire = Autowire.BY_NAME)
