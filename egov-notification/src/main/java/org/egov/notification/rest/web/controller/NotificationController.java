@@ -67,30 +67,37 @@ public class NotificationController {
 	@Autowired
 	private MessagingService messagingService;
 	private ResponseInfo resInfo = null;
-	
+
 	@RequestMapping(value = "/sms", method = RequestMethod.POST)
 	public ResponseInfo sms(@RequestParam(value = "mobile_no", required = true) String mobile_no,
 			@RequestParam(value = "message", required = true) String message, @RequestBody RequestInfo request)
 			throws Exception {
 
+		LOGGER.info("RequestParams mobile_no: " + mobile_no + " ,message: " + message + " and requestInfo: "
+				+ request.toString());
+
 		if (mobile_no == null || mobile_no.isEmpty()) {
 			resInfo = new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 					request.getMsgId(), "Mobile number is required");
+			LOGGER.info("Mobile number is required");
 			throw new Exception("Mobile number is required");
 		}
 		if (mobile_no.matches("\\d+")) {
 			if (!mobile_no.matches("\\d{10}")) {
 				resInfo = new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 						request.getMsgId(), mobile_no + " is not valid mobile number");
+				LOGGER.info(mobile_no + " is not valid mobile number");
 				throw new Exception(mobile_no + " is not valid mobile number");
 			}
 		} else {
 			resInfo = new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 					request.getMsgId(), mobile_no + " is not valid mobile number");
+			LOGGER.info(mobile_no + " is not valid mobile number");
 			throw new Exception(mobile_no + " is not valid mobile number");
 		}
 
 		messagingService.sendSMS(mobile_no, message, HIGH);
+		LOGGER.info("Sent SMS successfully to " + mobile_no);
 		return new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 				request.getMsgId(), "Sent SMS successfully to " + mobile_no);
 
@@ -101,18 +108,25 @@ public class NotificationController {
 			@RequestParam(value = "subject", required = true) String subject,
 			@RequestParam(value = "body", required = true) String body, @RequestBody RequestInfo request)
 			throws Exception {
+
+		LOGGER.info("RequestParams email: " + email + " ,subject: " + subject + " ,body: " + body + " and requestInfo: "
+				+ request.toString());
+
 		if (email == null || email.isEmpty()) {
 			resInfo = new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 					request.getMsgId(), "Email Address is required");
+			LOGGER.info("Email Address is required");
 			throw new Exception("Email Address is required");
 
 		}
 		if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
 			resInfo = new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 					request.getMsgId(), email + " is not valid email address");
+			LOGGER.info(email + " is not valid email address");
 			throw new Exception(email + " is not valid email address");
 		}
 		messagingService.sendEmail(email, subject, body);
+		LOGGER.info("Sent Email successfully to " + email);
 		return new ResponseInfo(request.getApiId(), request.getVer(), new DateTime().toString(), "uief87324",
 				request.getMsgId(), "Sent Email successfully to " + email);
 
