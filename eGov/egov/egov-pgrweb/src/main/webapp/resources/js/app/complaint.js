@@ -125,7 +125,12 @@ jQuery(document).ready(function($)
 //			"Content-Type" : "application/x-www-form-urlencoded",  
 //		    "Authorization": "Basic " + btoa("egov-pgrrest" + ":" + "egov-pgrrest")
 //		  },
-//		  data: '{ "comment" }',
+//		  data:{
+//			  "username": "9999999999",
+//			  "scope": "read+write",
+//			  "password": "demo",
+//			  "grant_type": "password"
+//			 },
 //		  success: function (){
 //		    alert('Thanks for your comment!'); 
 //		  }
@@ -134,16 +139,16 @@ jQuery(document).ready(function($)
 		$.ajax({
 			type: "POST",
 			contentType: "application/json",
-			url: "http://localhost:8090/pgrrest/a1/requests?jurisdiction_id=ap.test",
+			url: "http://localhost:8080/pgrrest/a1/requests?jurisdiction_id=ap.test",
 			processData: false,
 			data:JSON.stringify(prepareRequest()),
 			success : function(response) {
 				console.log("success"+response );
-				var jsonObject = JSON.parse(response);
-				$.each(jsonObject.result,function(key,val){
+				$.each(response.ServiceRequests[0],function(key,val){
 					$('div[data-api-key='+key+']').html(val);
 				});
-				$('div[data-api-key=location]').html(jsonObject.result.childLocationName +"-"+ jsonObject.result.locationName);
+				
+				$('div[data-api-key="location"]').html(response.ServiceRequests[0].values[0].values);
 				$('#success').show();
 				$('#registration').hide();
 			},
@@ -173,7 +178,7 @@ jQuery(document).ready(function($)
 		var RequestInfo = {};
 		RequestInfo.api_id = "org.egov.pgr";
 		RequestInfo.ver = "1.0";
-		RequestInfo.ts = currentDate;
+		RequestInfo.ts = "05-01-2017 10:50:00";
 		RequestInfo.action = "POST";
 		RequestInfo.did = "4354648646";
 		RequestInfo.key = "XYZ";
@@ -210,7 +215,7 @@ jQuery(document).ready(function($)
 		$.ajax({
 			type: "POST",
 			contentType: "application/json",
-			url: "http://localhost:8090/pgrrest/a1/requests?jurisdiction_id=ap.test",
+			url: "http://localhost:8080/pgrrest/a1/requests?jurisdiction_id=ap.test",
 			data:JSON.stringify(prepareRequest('ANONYMOUS')),
 			success : function(response) {
 				$.each(response.ServiceRequests[0],function(key,val){
