@@ -1,6 +1,9 @@
-FROM egovdevops/egov-jboss:latest
+FROM egovio/maven:1.0.0
 
 MAINTAINER Venki<venki@egovernments.org>
+
+# advertise jboss service port
+EXPOSE 8080 9990
 
 # copy src code into image
 COPY src /usr/local/src/egov-notifications/src
@@ -12,15 +15,10 @@ COPY pom.xml /usr/local/src/egov-notifications/
 WORKDIR /usr/local/src/egov-notifications
 
 # build artifacts using maven
-RUN mvn package -DskipTests
+RUN mvn clean package
 
-# deploy application into jboss
-RUN DEPLOY_DIR=$JBOSS_HOME/standalone/deployments \
- && cp target/egov-notification.war $DEPLOY_DIR \
- && cd $DEPLOY_DIR \
- && touch $(ls egov-notification.war).dodeploy
-
-CMD $JBOSS_HOME/bin/standalone.sh --debug --server-config=standalone.xml -Dspring.profiles.active=$ENV -b 0.0.0.0 -bmanagement=0.0.0.0
+# starting
+CMD ["java", "-jar", "target/egov-notification-0.0.1-SNAPSHOT.jar"]
 
 # NOTE: the two 'RUN' commands can probably be combined inside of a single
 # script (i.e. RUN build-and-install-app.sh) so that we can also clean up the

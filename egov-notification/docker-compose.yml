@@ -1,11 +1,13 @@
 version: '2'
 services:
-  postgres:
-    image: postgres:9.4
+  kafka:
+    image: spotify/kafka:latest #pulling from spotfiy because zookeeper is req is rolled in
     environment:
-      - POSTGRES_DB=lbase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypass
+      - ADVERTISED_HOST=localhost
+      - ADVERTISED_PORT=9092
+    ports:
+      - "2181:2181"
+      - "9092:9092"
   notifications:
     build: .
     ports:
@@ -13,17 +15,4 @@ services:
       - "9990:9990"
       - "8787:8787"
     links:
-      - postgres:pghost
-    environment:
-      - DB_HOST=pghost
-      - DB_NAME=lbase
-      - DB_USER=myuser
-      - DB_PASSWORD=mypass
-      - MAIL_ENABLED=true
-      - MAIL_USERNAME=erp.support@cdma.gov.in
-      - MAIL_PASSWORD=APcDm@E6p#123
-      - SMS_ENABLED=true
-      - SMS_URL=http://msdgweb.mgov.gov.in/esms/sendsmsrequest
-      - SMS_USERNAME=CDMA
-      - SMS_PASSWORD=eSuvidha@123
-      - SMS_SENDER=CDMASM
+      - kafka
