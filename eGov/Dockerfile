@@ -1,4 +1,4 @@
-FROM egov-jboss:latest
+FROM egovio/jboss:latest
 
 MAINTAINER Sonny Garcia <sonnygarcia@icloud.com>
 
@@ -7,6 +7,9 @@ COPY egov /usr/local/src/egov
 
 # set the context for the rest of the cmds
 WORKDIR /usr/local/src/egov
+
+# expose envvars used to control runtime behavior
+ENV REST_HOST=egov-pgrrest
 
 # build artifacts using maven
 RUN mvn package -DskipTests
