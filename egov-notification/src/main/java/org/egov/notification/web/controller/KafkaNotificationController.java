@@ -3,6 +3,7 @@ package org.egov.notification.web.controller;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -33,15 +34,10 @@ public class KafkaNotificationController {
 	@Qualifier("smsService")
 	private SMSService smsService;
 
+	@Autowired
 	private EmailService emailService;
 
 	public KafkaConsumer<String, String> notifications;
-
-	@RequestMapping(value = "/hello", method = RequestMethod.GET)
-	public String hi() {
-
-		return "Hi satyam";
-	}
 
 	@RequestMapping(value = "/kafka/send", method = RequestMethod.GET)
 	public String sender() {
@@ -58,18 +54,25 @@ public class KafkaNotificationController {
 		System.err.println("producer ********************* " + new Date().toString());
 		Producer<String, String> producer = new KafkaProducer<>(props);
 		Date now = new Date();
-		java.util.concurrent.Future<RecordMetadata> future = producer.send(new ProducerRecord<String, String>(
-				"egov-notification-sms", "7204695548", "Test Message " + new Date()));
+		SMSRequest smsRequest = new SMSRequest();
+		smsRequest.setMobileNo("7204695548");
+		smsRequest.setMessage("Test Message " + new Date());
+		Gson gson = new Gson();
+		Future<RecordMetadata> future = producer.send(
+				new ProducerRecord<String, String>("egov-notification-sms", "sms-testing", gson.toJson(smsRequest)));
 		String logMessage = "*** Wrote to Kafka topic egov-notification-sms at time " + now + ", obtained future "
 				+ future.toString();
 		System.err.println(logMessage);
-		/*
-		 * TODO also write to email queue producer.send(new
-		 * ProducerRecord<String, String>("egov-notification-email",
-		 * "venki@egovernments.org", "Test Email eGov Notification " + new
-		 * Date())); System.err.println( "producer 2********************* " +
-		 * new Date().toString());
-		 */
+		EmailRequest emailRequest = new EmailRequest();
+		emailRequest.setEmail("venkicse506@gmail.com");
+		emailRequest.setSubject("Test Email eGov Notification");
+		emailRequest.setBody("Testing Email eGov Notification");
+		logMessage = "*** Wrote to Kafka topic egov-notification-email at time " + now + ", obtained future "
+				+ future.toString();
+		future = producer.send(new ProducerRecord<String, String>("egov-notification-email", "email-testing",
+				gson.toJson(emailRequest)));
+		System.err.println(logMessage);
+
 		producer.close();
 		return logMessage;
 	}
@@ -104,9 +107,8 @@ public class KafkaNotificationController {
 					System.err.println("***** received message [key " + record.key() + "] + value [" + record.value()
 							+ "] from topic egov-notification-email");
 					Gson gson = new Gson();
-					EmailRequest request = gson.fromJson(record.value(), EmailRequest.class); //
-					emailService.sendMail(request.getEmail(), //
-							request.getSubject(), request.getBody());
+					EmailRequest request = gson.fromJson(record.value(), EmailRequest.class);
+					emailService.sendMail(request.getEmail(), request.getSubject(), request.getBody());
 				}
 
 			}
