@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RequestInfo {
 	@JsonProperty("api_id")
-	private String apiId = null;
+	private String api_id = null;
 
 	@JsonProperty("ver")
 	private String ver = null;
@@ -27,25 +27,25 @@ public class RequestInfo {
 	private String key = null;
 
 	@JsonProperty("msg_id")
-	private String msgId = null;
+	private String msg_id = null;
 
 	@JsonProperty("requester_id")
-	private String requesterId = null;
+	private String requester_id = null;
 
 	@JsonProperty("auth_token")
-	private String authToken = null;
+	private String auth_token = null;
 
-	public RequestInfo apiId(String apiId) {
-		this.apiId = apiId;
+	public RequestInfo api_id(String api_id) {
+		this.api_id = api_id;
 		return this;
 	}
 
-	public String getApiId() {
-		return apiId;
+	public String getApi_id() {
+		return api_id;
 	}
 
-	public void setApiId(String apiId) {
-		this.apiId = apiId;
+	public void setApi_id(String api_id) {
+		this.api_id = api_id;
 	}
 
 	public RequestInfo ver(String ver) {
@@ -113,47 +113,47 @@ public class RequestInfo {
 		this.key = key;
 	}
 
-	public RequestInfo msgId(String msgId) {
-		this.msgId = msgId;
+	public RequestInfo msg_id(String msg_id) {
+		this.msg_id = msg_id;
 		return this;
 	}
 
-	public String getMsgId() {
-		return msgId;
+	public String getMsg_id() {
+		return msg_id;
 	}
 
-	public void setMsgId(String msgId) {
-		this.msgId = msgId;
+	public void setMsg_id(String msg_id) {
+		this.msg_id = msg_id;
 	}
 
-	public RequestInfo requesterId(String requesterId) {
-		this.requesterId = requesterId;
+	public RequestInfo requester_id(String requester_id) {
+		this.requester_id = requester_id;
 		return this;
 	}
 
-	public String getRequesterId() {
-		return requesterId;
+	public String getRequester_id() {
+		return requester_id;
 	}
 
-	public void setRequesterId(String requesterId) {
-		this.requesterId = requesterId;
+	public void setRequester_id(String requester_id) {
+		this.requester_id = requester_id;
 	}
 
-	public RequestInfo authToken(String authToken) {
-		this.authToken = authToken;
+	public RequestInfo auth_token(String auth_token) {
+		this.auth_token = auth_token;
 		return this;
 	}
 
-	public String getAuthToken() {
-		return authToken;
+	public String getAuth_token() {
+		return auth_token;
 	}
 
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
+	public void setAuth_token(String auth_token) {
+		this.auth_token = auth_token;
 	}
 
 	public boolean validate(RequestInfo requestInfo) {
-		return (requestInfo.getApiId() != null && !requestInfo.getApiId().isEmpty() && requestInfo.getVer() != null
+		return (requestInfo.getApi_id() != null && !requestInfo.getApi_id().isEmpty() && requestInfo.getVer() != null
 				&& !requestInfo.getVer().isEmpty()) && Objects.nonNull(requestInfo.getTs());
 	}
 
@@ -166,17 +166,17 @@ public class RequestInfo {
 			return false;
 		}
 		RequestInfo requestInfo = (RequestInfo) o;
-		return Objects.equals(this.apiId, requestInfo.apiId) && Objects.equals(this.ver, requestInfo.ver)
+		return Objects.equals(this.api_id, requestInfo.api_id) && Objects.equals(this.ver, requestInfo.ver)
 				&& Objects.equals(this.ts, requestInfo.ts) && Objects.equals(this.action, requestInfo.action)
 				&& Objects.equals(this.did, requestInfo.did) && Objects.equals(this.key, requestInfo.key)
-				&& Objects.equals(this.msgId, requestInfo.msgId)
-				&& Objects.equals(this.requesterId, requestInfo.requesterId)
-				&& Objects.equals(this.authToken, requestInfo.authToken);
+				&& Objects.equals(this.msg_id, requestInfo.msg_id)
+				&& Objects.equals(this.requester_id, requestInfo.requester_id)
+				&& Objects.equals(this.auth_token, requestInfo.auth_token);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(apiId, ver, ts, action, did, key, msgId, requesterId, authToken);
+		return Objects.hash(api_id, ver, ts, action, did, key, msg_id, requester_id, auth_token);
 	}
 
 	@Override
@@ -184,15 +184,15 @@ public class RequestInfo {
 		StringBuilder sb = new StringBuilder();
 		sb.append("class RequestInfo {\n");
 
-		sb.append("    apiId: ").append(toIndentedString(apiId)).append("\n");
+		sb.append("    apiId: ").append(toIndentedString(api_id)).append("\n");
 		sb.append("    ver: ").append(toIndentedString(ver)).append("\n");
 		sb.append("    ts: ").append(toIndentedString(ts)).append("\n");
 		sb.append("    action: ").append(toIndentedString(action)).append("\n");
 		sb.append("    did: ").append(toIndentedString(did)).append("\n");
 		sb.append("    key: ").append(toIndentedString(key)).append("\n");
-		sb.append("    msgId: ").append(toIndentedString(msgId)).append("\n");
-		sb.append("    requesterId: ").append(toIndentedString(requesterId)).append("\n");
-		sb.append("    authToken: ").append(toIndentedString(authToken)).append("\n");
+		sb.append("    msgId: ").append(toIndentedString(msg_id)).append("\n");
+		sb.append("    requesterId: ").append(toIndentedString(requester_id)).append("\n");
+		sb.append("    authToken: ").append(toIndentedString(auth_token)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

@@ -79,38 +79,38 @@ public class NotificationController {
 	@RequestMapping(value = "/sms", method = RequestMethod.POST)
 	public ResponseInfo sms(@RequestBody SMSRequest request) throws Exception {
 
-		LOGGER.info("RequestParams mobile_no: " + request.getMobileNo() + " ,message: " + request.getMessage()
+		LOGGER.info("RequestParams mobile_no: " + request.getMobile_no() + " ,message: " + request.getMessage()
 				+ " and requestInfo: " + request.toString());
 
-		if (request.getMobileNo() == null || request.getMobileNo().isEmpty()) {
-			resInfo = new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
+		if (request.getMobile_no() == null || request.getMobile_no().isEmpty()) {
+			resInfo = new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
 					"Mobile number is required");
 			LOGGER.info("Mobile number is required");
 			throw new Exception("Mobile number is required");
 		}
-		if (request.getMobileNo().matches("\\d+")) {
-			if (!request.getMobileNo().matches("\\d{10}")) {
-				resInfo = new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-						new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
-						request.getMobileNo() + " is not valid mobile number");
-				LOGGER.info(request.getMobileNo() + " is not valid mobile number");
-				throw new Exception(request.getMobileNo() + " is not valid mobile number");
+		if (request.getMobile_no().matches("\\d+")) {
+			if (!request.getMobile_no().matches("\\d{10}")) {
+				resInfo = new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+						new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
+						request.getMobile_no() + " is not valid mobile number");
+				LOGGER.info(request.getMobile_no() + " is not valid mobile number");
+				throw new Exception(request.getMobile_no() + " is not valid mobile number");
 			}
 		} else {
-			resInfo = new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
-					request.getMobileNo() + " is not valid mobile number");
-			LOGGER.info(request.getMobileNo() + " is not valid mobile number");
-			throw new Exception(request.getMobileNo() + " is not valid mobile number");
+			resInfo = new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
+					request.getMobile_no() + " is not valid mobile number");
+			LOGGER.info(request.getMobile_no() + " is not valid mobile number");
+			throw new Exception(request.getMobile_no() + " is not valid mobile number");
 		}
 
-		smsService.sendSMS(request.getMobileNo(), request.getMessage(), HIGH);
+		smsService.sendSMS(request.getMobile_no(), request.getMessage(), HIGH);
 
-		LOGGER.info("Sent SMS successfully to " + request.getMobileNo());
-		return new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-				new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
-				"Sent SMS successfully to " + request.getMobileNo());
+		LOGGER.info("Sent SMS successfully to " + request.getMobile_no());
+		return new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+				new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
+				"Sent SMS successfully to " + request.getMobile_no());
 
 	}
 
@@ -121,16 +121,16 @@ public class NotificationController {
 				+ request.getBody() + " and requestInfo: " + request.toString());
 
 		if (request.getEmail() == null || request.getEmail().isEmpty()) {
-			resInfo = new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
+			resInfo = new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
 					"Email Address is required");
 			LOGGER.info("Email Address is required");
 			throw new Exception("Email Address is required");
 
 		}
 		if (!request.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-			resInfo = new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
+			resInfo = new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+					new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
 					request.getEmail() + " is not valid email address");
 			LOGGER.info(request.getEmail() + " is not valid email address");
 			throw new Exception(request.getEmail() + " is not valid email address");
@@ -139,8 +139,8 @@ public class NotificationController {
 		emailService.sendMail(request.getEmail(), request.getSubject(), request.getBody());
 
 		LOGGER.info("Sent Email successfully to " + request.getEmail());
-		return new ResponseInfo(request.getRequestInfo().getApiId(), request.getRequestInfo().getVer(),
-				new DateTime().toString(), "uief87324", request.getRequestInfo().getMsgId(),
+		return new ResponseInfo(request.getRequestInfo().getApi_id(), request.getRequestInfo().getVer(),
+				new DateTime().toString(), "uief87324", request.getRequestInfo().getMsg_id(),
 				"Sent Email successfully to " + request.getEmail());
 
 	}

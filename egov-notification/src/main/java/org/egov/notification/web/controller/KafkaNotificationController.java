@@ -55,7 +55,7 @@ public class KafkaNotificationController {
 		Producer<String, String> producer = new KafkaProducer<>(props);
 		Date now = new Date();
 		SMSRequest smsRequest = new SMSRequest();
-		smsRequest.setMobileNo("7204695548");
+		smsRequest.setMobile_no("7204695548");
 		smsRequest.setMessage("Test Message " + new Date());
 		Gson gson = new Gson();
 		Future<RecordMetadata> future = producer.send(
@@ -94,14 +94,14 @@ public class KafkaNotificationController {
 		while (true) {
 			ConsumerRecords<String, String> records = notifications.poll(1000);
 			System.err.println("******** polling at time " + new Date().toString());
-			for (ConsumerRecord<String, String> record : records) {
+			for (ConsumerRecord<String, String> record : records) { 
 				if (record.topic().equals("egov-notification-sms")) {
 					System.err.println("***** received message [key" + record.key() + "] + value [" + record.value()
 							+ "] from topic egov-notification-sms");
 
 					Gson gson = new Gson();
 					SMSRequest request = gson.fromJson(record.value(), SMSRequest.class);
-					smsService.sendSMS(request.getMobileNo(), request.getMessage(), MessagePriority.HIGH);
+					smsService.sendSMS(request.getMobile_no(), request.getMessage(), MessagePriority.HIGH);
 				}
 				if (record.topic().equals("egov-notification-email")) {
 					System.err.println("***** received message [key " + record.key() + "] + value [" + record.value()

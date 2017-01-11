@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ResponseInfo {
 	@JsonProperty("api_id")
-	private String apiId = null;
+	private String api_id = null;
 
 	@JsonProperty("ver")
 	private String ver = null;
@@ -15,34 +15,34 @@ public class ResponseInfo {
 	private String ts = null;
 
 	@JsonProperty("res_msg_id")
-	private String resMsgId = null;
+	private String res_msg_id = null;
 
 	@JsonProperty("msg_id")
-	private String msgId = null;
+	private String msg_id = null;
 
 	@JsonProperty("status")
 	private String status = null;
 
 	public ResponseInfo(String apiId, String ver, String ts, String resMsgId, String msgId, String status) {
-		this.apiId = apiId;
+		this.api_id = apiId;
 		this.ver = ver;
 		this.ts = ts;
-		this.resMsgId = resMsgId;
-		this.msgId = msgId;
+		this.res_msg_id = resMsgId;
+		this.msg_id = msgId;
 		this.status = status;
 	}
 
-	public ResponseInfo apiId(String apiId) {
-		this.apiId = apiId;
+	public ResponseInfo api_id(String apiId) {
+		this.api_id = apiId;
 		return this;
 	}
 
-	public String getApiId() {
-		return apiId;
+	public String getApi_id() {
+		return api_id;
 	}
 
-	public void setApiId(String apiId) {
-		this.apiId = apiId;
+	public void setApi_id(String api_id) {
+		this.api_id = api_id;
 	}
 
 	public ResponseInfo ver(String ver) {
@@ -71,30 +71,30 @@ public class ResponseInfo {
 		this.ts = ts;
 	}
 
-	public ResponseInfo resMsgId(String resMsgId) {
-		this.resMsgId = resMsgId;
+	public ResponseInfo res_msg_id(String res_msg_id) {
+		this.res_msg_id = res_msg_id;
 		return this;
 	}
 
-	public String getResMsgId() {
-		return resMsgId;
+	public String getRes_msg_id() {
+		return res_msg_id;
 	}
 
-	public void setResMsgId(String resMsgId) {
-		this.resMsgId = resMsgId;
+	public void setRes_msg_id(String res_msg_id) {
+		this.res_msg_id = res_msg_id;
 	}
 
-	public ResponseInfo msgId(String msgId) {
-		this.msgId = msgId;
+	public ResponseInfo msg_id(String msg_id) {
+		this.msg_id = msg_id;
 		return this;
 	}
 
-	public String getMsgId() {
-		return msgId;
+	public String getMsg_id() {
+		return msg_id;
 	}
 
-	public void setMsgId(String msgId) {
-		this.msgId = msgId;
+	public void setMsg_id(String msg_id) {
+		this.msg_id = msg_id;
 	}
 
 	public ResponseInfo status(String status) {
@@ -119,14 +119,14 @@ public class ResponseInfo {
 			return false;
 		}
 		ResponseInfo responseInfo = (ResponseInfo) o;
-		return Objects.equals(this.apiId, responseInfo.apiId) && Objects.equals(this.ver, responseInfo.ver)
-				&& Objects.equals(this.ts, responseInfo.ts) && Objects.equals(this.resMsgId, responseInfo.resMsgId)
-				&& Objects.equals(this.msgId, responseInfo.msgId) && Objects.equals(this.status, responseInfo.status);
+		return Objects.equals(this.api_id, responseInfo.api_id) && Objects.equals(this.ver, responseInfo.ver)
+				&& Objects.equals(this.ts, responseInfo.ts) && Objects.equals(this.res_msg_id, responseInfo.res_msg_id)
+				&& Objects.equals(this.msg_id, responseInfo.msg_id) && Objects.equals(this.status, responseInfo.status);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(apiId, ver, ts, resMsgId, msgId, status);
+		return Objects.hash(api_id, ver, ts, res_msg_id, msg_id, status);
 	}
 
 	@Override
@@ -134,11 +134,11 @@ public class ResponseInfo {
 		StringBuilder sb = new StringBuilder();
 		sb.append("class ResponseInfo {\n");
 
-		sb.append("    apiId: ").append(toIndentedString(apiId)).append("\n");
+		sb.append("    apiId: ").append(toIndentedString(api_id)).append("\n");
 		sb.append("    ver: ").append(toIndentedString(ver)).append("\n");
 		sb.append("    ts: ").append(toIndentedString(ts)).append("\n");
-		sb.append("    resMsgId: ").append(toIndentedString(resMsgId)).append("\n");
-		sb.append("    msgId: ").append(toIndentedString(msgId)).append("\n");
+		sb.append("    resMsgId: ").append(toIndentedString(res_msg_id)).append("\n");
+		sb.append("    msgId: ").append(toIndentedString(msg_id)).append("\n");
 		sb.append("    status: ").append(toIndentedString(status)).append("\n");
 		sb.append("}");
 		return sb.toString();
