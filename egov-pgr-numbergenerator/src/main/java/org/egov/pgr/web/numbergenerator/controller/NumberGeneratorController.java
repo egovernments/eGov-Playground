@@ -1,6 +1,8 @@
-package org.egov.pgr.web.validation.controller;
+package org.egov.pgr.web.numbergenerator.controller;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -11,9 +13,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.egov.pgr.web.validation.ValidateSevaRequest;
-import org.egov.pgr.web.validation.model.ServiceRequestReq;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.egov.pgr.web.numbergenerator.model.ServiceRequestReq;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -22,12 +22,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-public class ValidationRequestController {
+public class NumberGeneratorController {
 
-	@Autowired
-	private ValidateSevaRequest validateSevaRequest;
-
-	public void newRequestsReceiver() {
+	public void validatedRequestsReceiver() {
 		Properties props = new Properties();
 		props.put("bootstrap.servers", "localhost:9092");
 		props.put("group.id", "notifications");
@@ -36,7 +33,7 @@ public class ValidationRequestController {
 		props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 		KafkaConsumer<String, String> savedRequests = new KafkaConsumer<>(props);
-		savedRequests.subscribe(Arrays.asList("ap.public.mseva.new"));
+		savedRequests.subscribe(Arrays.asList("ap.public.mseva.validated"));
 		while (true) {
 			ConsumerRecords<String, String> records = savedRequests.poll(5000);
 			System.err.println("******** polling savedRequestsReceiver at time " + new Date().toString());
@@ -46,9 +43,9 @@ public class ValidationRequestController {
 				ServiceRequestReq request;
 				try {
 					request = mapper.readValue(record.value(), ServiceRequestReq.class);
-					if (validateSevaRequest.validate(request)) {
-						pushValidatedRequests(request, "ap.public.mseva.validated");
-					}
+					String crn = new BigInteger(130, new SecureRandom()).toString(32);
+					request.getServiceRequest().setCrn(crn);
+					pushNumberGeneratedRequests(request, "ap.public.mseva.numbergenerated");
 				} catch (JsonParseException e) {
 					e.printStackTrace();
 				} catch (JsonMappingException e) {
@@ -61,7 +58,7 @@ public class ValidationRequestController {
 		}
 	}
 
-	private void pushValidatedRequests(ServiceRequestReq request, String topic) throws JsonProcessingException {
+	private void pushNumberGeneratedRequests(ServiceRequestReq request, String topic) throws JsonProcessingException {
 		Properties props = new Properties();
 		props.put("bootstrap.servers", "localhost:9092");
 		props.put("acks", "all");
