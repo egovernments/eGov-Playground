@@ -135,11 +135,13 @@ jQuery(document).ready(function($)
 //		    alert('Thanks for your comment!'); 
 //		  }
 //		});
-		
+//		var host = $('#resthost').val();
+//		if(host === "" || host === null)
+//			host = "http://localhost:8080";
 		$.ajax({
 			type: "POST",
 			contentType: "application/json",
-			url: "http://localhost:8080/pgrrest/a1/requests?jurisdiction_id=ap.test",
+			url: "http://localhost:8080/pgrrest/a1/requests?jurisdiction_id=ap.test&tenant_id=ap.test",
 			processData: false,
 			data:JSON.stringify(prepareRequest()),
 			success : function(response) {
@@ -212,16 +214,18 @@ jQuery(document).ready(function($)
 
 	$('#create-anonymous-grievance').click(function() {
 
+//		var host = $('#resthost').val();
+//		if(host === "" || host === null)
+//			host = "http://localhost:8080";
 		$.ajax({
 			type: "POST",
 			contentType: "application/json",
-			url: "http://localhost:8080/pgrrest/a1/requests?jurisdiction_id=ap.test",
+			url: "http://localhost:8080/pgrrest/a1/requests?jurisdiction_id=ap.test&tenant_id=ap.test",
 			data:JSON.stringify(prepareRequest('ANONYMOUS')),
 			success : function(response) {
 				$.each(response.ServiceRequests[0],function(key,val){
 					$('div[data-api-key='+key+']').html(val);
 				});
-				
 				$('div[data-api-key="location"]').html(response.ServiceRequests[0].values[0].values);
 				$('#success').show();
 				$('#registration').hide();
