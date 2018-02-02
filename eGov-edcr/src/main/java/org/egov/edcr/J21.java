@@ -27,7 +27,7 @@ import org.kabeja.parser.ParserBuilder;
 import org.springframework.util.ResourceUtils;
 
 public class J21 {
-
+	private static Integer FLOOR_COLOUR_CODE = 10;
     public static void main(String[] args) {
 
         Parser parser = ParserBuilder.createDefaultParser();
@@ -45,8 +45,9 @@ public class J21 {
             DXFDocument doc = parser.getDocument();
 
             getHeightOfTheBuilding(doc);
-            
             Util util= new Util();
+            System.out.println("  Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
+       
           DXFLine line= util.getSingleLineByLayer(doc, "Shortest Distance to road");
           
           if(line !=null && line.getLength()< 3)
@@ -113,6 +114,8 @@ public class J21 {
     	
     }
 
+
+	
     private static double polygonArea(ArrayList<Double> x, ArrayList<Double> y, int numPoints) {
 
         double area = 0;         // Accumulates area in the loop

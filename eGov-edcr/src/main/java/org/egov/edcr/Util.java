@@ -19,6 +19,7 @@ import org.kabeja.dxf.DXFVertex;
 import org.kabeja.dxf.helpers.Point;
 
 public class Util {
+	private static String FLOOR_NAME_PREFIX = "FLOOR_";
 
 	public List<DXFLWPolyline> getPolyLinesByColor(DXFDocument dxfDocument, Integer colorCode) {
 
@@ -235,7 +236,7 @@ public class Util {
 		return convertedArea.setScale(4, RoundingMode.HALF_UP).abs();
 
 	}
-	
+		
  public static	Map<String,String>	getPlanInfoProperties(DXFDocument doc)
 	{
 		
@@ -282,6 +283,56 @@ public class Util {
 		return planInfoProperties;
 	
 	}
- 
+
+	protected static int getTotalFloorCount(DXFDocument dxfDocument, Integer colorCode) {
+
+		int i = 0;
+		Iterator dxfLayerIterator = dxfDocument.getDXFLayerIterator();
+		while (dxfLayerIterator.hasNext()) {
+
+			DXFLayer dxfLayer = (DXFLayer) dxfLayerIterator.next();
+
+			if ((colorCode != null && dxfLayer.getColor() == colorCode)
+					|| dxfLayer.getName().startsWith(FLOOR_NAME_PREFIX)) {
+				i++;
+			}
+
+		}
+
+		return i;
+	}
+
+	protected static int getFloorCountExcludingCeller(DXFDocument dxfDocument, Integer colorCode) {
+		int i = 0;
+		Iterator dxfLayerIterator = dxfDocument.getDXFLayerIterator();
+		while (dxfLayerIterator.hasNext()) {
+
+			DXFLayer dxfLayer = (DXFLayer) dxfLayerIterator.next();
+
+			if ((colorCode != null && dxfLayer.getColor() == colorCode)
+					|| dxfLayer.getName().startsWith(FLOOR_NAME_PREFIX)) {
+				try {
+
+					if (colorCode != null && dxfLayer.getColor() == colorCode) {
+						i++;
+					} else {
+						String[] floorName = dxfLayer.getName().split(FLOOR_NAME_PREFIX);
+						if (floorName.length > 0 && floorName[1] != null && Integer.parseInt(floorName[1]) >= 0) {
+							i++;
+						}
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					// throw new RuntimeException("Floor number not in format");
+					// //TODO: HANDLE THIS LATER
+				}
+
+			}
+
+		}
+
+		return i;
+	}
 
 }
