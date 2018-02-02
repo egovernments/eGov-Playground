@@ -244,18 +244,39 @@ public class Util {
 		String param="";
 		DXFText	text=null;
 		Map<String,String> planInfoProperties=new HashMap<>();
-		while(texts.iterator().hasNext())
+		Iterator iterator = texts.iterator();
+		String[] split;
+		String s="\\";
+		while(iterator.hasNext())
 		{
-			text= (DXFText)texts.iterator().next();
+			text= (DXFText)iterator.next();
+			
 			param=text.getText();
+			param=param.replace(s, "#");
 			System.out.println(param);
-			String[] data = param.split("=");
+			if(param.contains("#P"))
+			{
+				System.out.println("inside");
+				split = param.split("#P");
+			}
+			else
+			{
+				split=new String [1];
+				split[0]=param;
+			}
+			
+			for (int j=0;j<split.length;j++)
+			{
+		 
+			String[] data = split[j].split("=");
 			if(data.length==2)
 			{
+				System.out.println(data[0]+"---"+data[1]);
 				planInfoProperties.put(data[0], data[1]);
 			}else
 			{
 				//throw new RuntimeException("Plan info sheet data not following standard '=' for " +param);
+			}
 			}
 		}
 		return planInfoProperties;
