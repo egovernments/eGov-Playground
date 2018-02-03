@@ -28,6 +28,8 @@ import org.springframework.util.ResourceUtils;
 
 public class J21 {
 	private static Integer FLOOR_COLOUR_CODE = 10;
+	private static String LAYER_NAME_WASTE_DISPOSAL="Waste disposal";
+	private static String CRZ_ZONE="CRZ_ZONE";
     public static void main(String[] args) {
 
         Parser parser = ParserBuilder.createDefaultParser();
@@ -46,7 +48,18 @@ public class J21 {
 
             getHeightOfTheBuilding(doc);
             Util util= new Util();
-            System.out.println("  Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
+            System.out.println("Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
+            
+            List<DXFLWPolyline> wasterDisposalPolyLines= util.getPolyLinesByLayer(doc, LAYER_NAME_WASTE_DISPOSAL);
+            
+            if(wasterDisposalPolyLines.size()>0) //Mean, they defined waster disposal.
+            {
+            	  System.out.println("Waste disposal difined in the diagram."); 
+            }else
+            {
+          	  System.err.println("Waste disposal not defined.Application not accepted"); //TODO: CHECK IS IT MANDATORY.
+            }
+           
        
           DXFLine line= util.getSingleLineByLayer(doc, "Shortest Distance to road");
           
@@ -55,7 +68,7 @@ public class J21 {
         	  System.err.println("Shortest Distance to road condition violated");
           }else
           {
-        	  System.out.println(" Shortest Distance to road condition is accepted");
+        	  System.out.println("Shortest Distance to road condition is accepted");
           }
             
           List<DXFLWPolyline> frontYardLines= util.getPolyLinesByLayer(doc, "Front yard");
@@ -84,6 +97,18 @@ public class J21 {
             Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
             System.out.println("Plot Area="+planInfoProperties.get("PLOT_AREA"));
 
+            if(planInfoProperties.get(CRZ_ZONE)!=null)
+	            {
+            	if(planInfoProperties.get(CRZ_ZONE).equalsIgnoreCase("YES"))
+	          	  System.out.println("SITE MARKED UNDER CRZ ZONE. CHECK NOC DURING DOCUMENT SCRUTINY."); 
+            	else
+            		System.out.println("SITE NOT MARKED UNDER CRZ ZONE."); 
+            	
+	          }else
+	          {
+	        	  System.err.println("CRZ ZONE DETAILS NOT MENTIONED"); //TODO: CHECK IS IT MANDATORY.
+	          }
+            
             Iterator dxfLayerIterator = doc.getDXFLayerIterator();
 
                 

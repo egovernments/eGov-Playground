@@ -254,10 +254,10 @@ public class Util {
 			
 			param=text.getText();
 			param=param.replace(s, "#");
-			System.out.println(param);
+		//	System.out.println(param);
 			if(param.contains("#P"))
 			{
-				System.out.println("inside");
+			//	System.out.println("inside");
 				split = param.split("#P");
 			}
 			else
@@ -272,7 +272,7 @@ public class Util {
 			String[] data = split[j].split("=");
 			if(data.length==2)
 			{
-				System.out.println(data[0]+"---"+data[1]);
+			//	System.out.println(data[0]+"---"+data[1]);
 				planInfoProperties.put(data[0], data[1]);
 			}else
 			{
