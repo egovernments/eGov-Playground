@@ -2,25 +2,15 @@
 package org.egov.edcr;
 
 
-import java.awt.Polygon;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.kabeja.dxf.DXFConstants;
+import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFDocument;
-import org.kabeja.dxf.DXFEntity;
 import org.kabeja.dxf.DXFLWPolyline;
-import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
-import org.kabeja.dxf.DXFMText;
-import org.kabeja.dxf.DXFVertex;
-import org.kabeja.dxf.helpers.Point;
 import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
@@ -60,7 +50,9 @@ public class J21 {
           	  System.err.println("Waste disposal not defined.Application not accepted"); //TODO: CHECK IS IT MANDATORY.
             }
            
+        
        
+            //rule 26
           DXFLine line= util.getSingleLineByLayer(doc, "Shortest Distance to road");
           
           if(line !=null && line.getLength()< 3)
@@ -70,11 +62,29 @@ public class J21 {
           {
         	  System.out.println("Shortest Distance to road condition is accepted");
           }
-            
+          
+          //rule 26a
+          
+          
+          //rule 61
+          
+          System.out.println("  Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
+          if(util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE)>3)
+          {
+        	System.err.println("rule 61 total number of floors violated");  
+          }
+          else
+          {
+        	  System.err.println("rule 61 total number of floors accepted");  
+          }
+          
+          DXFLWPolyline frontYard=null; 
+          DXFLWPolyline rearYard=null;
           List<DXFLWPolyline> frontYardLines= util.getPolyLinesByLayer(doc, "Front yard");
           if(frontYardLines.size()==1)
           {
-        	  DXFLWPolyline frontYard=  frontYardLines.get(0);
+        	 
+			frontYard = frontYardLines.get(0);
         	/*  System.out.println(frontYard.getColumns());
         	  System.out.println(frontYard.getBounds().getMaximumY());
         	  System.out.println(frontYard.getBounds().getMinimumY());
@@ -85,15 +95,20 @@ public class J21 {
           List<DXFLWPolyline> rearYards= util.getPolyLinesByLayer(doc, "Rear yard");
           if(rearYards.size()==1)
           {
-        	  DXFLWPolyline frontYard=  rearYards.get(0);
+        	 
+			rearYard = rearYards.get(0);
         	/*  System.out.println(frontYard.getColumns());
         	  System.out.println(frontYard.getBounds().getMaximumY());
         	  System.out.println(frontYard.getBounds().getMinimumY());
         	*/ 
-        	  System.out.println("rear yard distance"+Math.abs(frontYard.getBounds().getMaximumY()-frontYard.getBounds().getMinimumY()));
+        	  System.out.println("rear yard distance"+Math.abs(rearYard.getBounds().getMaximumY()-rearYard.getBounds().getMinimumY()));
           }
+          
+          
+          
+          
             // getBlocks(doc);
-            
+            // rule 60 
             Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
             System.out.println("Plot Area="+planInfoProperties.get("PLOT_AREA"));
 
@@ -109,8 +124,24 @@ public class J21 {
 	        	  System.err.println("CRZ ZONE DETAILS NOT MENTIONED"); //TODO: CHECK IS IT MANDATORY.
 	          }
             
-            Iterator dxfLayerIterator = doc.getDXFLayerIterator();
 
+            if(Double.valueOf(planInfoProperties.get("PLOT_AREA"))>=125)
+            {
+            	 System.err.println("Plot are less than 125 m2 is violated");
+            }else
+            {
+            	 System.out.println("Plot are less than 125 m2 is accepted");
+            }
+           
+            List<DXFLWPolyline> polyLinesByLayer = util.getPolyLinesByLayer(doc, "Non notified road");
+            DXFLWPolyline nonNotifiedRoad=    polyLinesByLayer.get(0);
+            Bounds   roadBounds=   nonNotifiedRoad.getBounds();
+            roadBounds.debug();
+         
+            frontYard.getBounds().debug();
+            rearYard.getBounds().debug();
+            
+           
                 
 
         } catch (Exception e) {
