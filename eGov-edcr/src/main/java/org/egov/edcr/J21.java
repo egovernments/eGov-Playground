@@ -3,11 +3,11 @@ package org.egov.edcr;
 
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFDocument;
 import org.kabeja.dxf.DXFLWPolyline;
 import org.kabeja.dxf.DXFLine;
@@ -36,50 +36,105 @@ public class J21 {
             //Extract DXF Data
             DXFDocument doc = parser.getDocument();
 
-            getHeightOfTheBuilding(doc);
+          //  getHeightOfTheBuilding(doc);
             Util util= new Util();
-            System.out.println("Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
+         //   System.out.println("Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
             
-            List<DXFLWPolyline> wasterDisposalPolyLines= util.getPolyLinesByLayer(doc, LAYER_NAME_WASTE_DISPOSAL);
             
-            if(wasterDisposalPolyLines.size()>0) //Mean, they defined waster disposal.
-            {
-            	  System.out.println("Waste disposal difined in the diagram."); 
-            }else
-            {
-          	  System.err.println("Waste disposal not defined.Application not accepted"); //TODO: CHECK IS IT MANDATORY.
-            }
-           
-        
-       
-            //rule 26
-          DXFLine line= util.getSingleLineByLayer(doc, "Shortest Distance to road");
+            //Rule 23 A  
+            Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
+            System.out.println("\n####  Rule 23, 4 ####");
+            if(planInfoProperties.get(CRZ_ZONE)!=null)
+	            {
+            	if(planInfoProperties.get(CRZ_ZONE).equalsIgnoreCase("YES"))
+	          	  System.err.println("SITE MARKED UNDER CRZ ZONE. CHECK NOC DURING DOCUMENT SCRUTINY."); 
+            	else
+            		System.err.println("SITE NOT MARKED UNDER CRZ ZONE."); 
+            	
+	          }else
+	          {
+	        	  System.err.println("CRZ ZONE DETAILS NOT MENTIONED"); //TODO: CHECK IS IT MANDATORY.
+	          }
+            
+            validateVoltageLineFromOHEL(doc, util);
+            
+          for(int i=1;i<1500;i++)
+          {}
+           //rule 26
           
-          if(line !=null && line.getLength()< 3)
-          {
-        	  System.err.println("Shortest Distance to road condition violated");
-          }else
-          {
-        	  System.out.println("Shortest Distance to road condition is accepted");
-          }
+			List<DXFLWPolyline> nonNotifiedRoad = util.getPolyLinesByLayer(doc, "Non notified road");
+			List<DXFLWPolyline> notifiedRoad = util.getPolyLinesByLayer(doc, "Notified roads");
+
+			DXFLine line = util.getSingleLineByLayer(doc, "Shortest Distance to road");
+			System.out.println("\n####  Rule 26 ####");
+			System.out.println("Shortest Distance to road : " + line.getLength());
+			
+			//line.getBounds().debug();
+			if (nonNotifiedRoad.size() > 0) {
+				if (line != null && line.getLength() < 2) {
+					System.err.println("Shortest Distance to road condition violated for non notified roads");
+				} else {
+					System.out.println("Shortest Distance to road condition is accepted for non notified roads.");
+				}
+			}
+
+			if (notifiedRoad.size() > 0) {
+				if (line != null && line.getLength() < 3) {
+					System.err.println("Shortest Distance to road condition violated for notified roads");
+				} else {
+					System.out.println("Shortest Distance to road condition is accepted for notified roads.");
+				}
+			}
           
           //rule 26a
-          
-          
-          //rule 61
-          
-          System.out.println("  Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
-          if(util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE)>3)
+          List<DXFLWPolyline> wasterDisposalPolyLines= util.getPolyLinesByLayer(doc, LAYER_NAME_WASTE_DISPOSAL);
+          System.out.println("\n####  Rule 26 A ####"); 
+          if(wasterDisposalPolyLines.size()>0) //Mean, they defined waster disposal.
           {
-        	System.err.println("rule 61 total number of floors violated");  
+          	  System.out.println("Waste disposal difined in the diagram."); 
+          }else
+          {
+        	  System.err.println("Waste disposal not defined.Application not accepted"); //TODO: CHECK IS IT MANDATORY.
+          }
+          
+          DXFLWPolyline rearYard=null;
+          //Rule 60
+          System.out.println("\n####  Rule 60 ####");
+  
+          List<DXFLWPolyline> plotBoundary= util.getPolyLinesByLayer(doc, "Plot boundary");
+          if(plotBoundary.size()==1)
+          {
+        	 
+			rearYard = plotBoundary.get(0);
+
+        	  System.out.println(" Total Area in yards "+ util.getPolyLineArea(rearYard));
+          }
+                  // System.out.println("Plot Area="+planInfoProperties.get("PLOT_AREA"));
+
+                    if((util.getPolyLineArea(rearYard).compareTo(BigDecimal.valueOf(125))>0))
+                    {
+                    	 System.err.println("Plot are less than 125 m2 is violated");
+                    }else
+                    {
+                    	 System.out.println("Plot are less than 125 m2 is accepted");
+                    }
+                    
+          //rule 61
+          System.out.println("\n####  Rule 61 ####");
+          
+          System.out.println("Total Floors " + util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
+          
+         if(util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE)>3)
+          {
+        	System.err.println("Total number of floors violated");  
           }
           else
           {
-        	  System.err.println("rule 61 total number of floors accepted");  
+        	  System.out.println("Total number of floors accepted");  
           }
           
           DXFLWPolyline frontYard=null; 
-          DXFLWPolyline rearYard=null;
+         
           List<DXFLWPolyline> frontYardLines= util.getPolyLinesByLayer(doc, "Front yard");
           if(frontYardLines.size()==1)
           {
@@ -87,11 +142,40 @@ public class J21 {
 			frontYard = frontYardLines.get(0);
         	/*  System.out.println(frontYard.getColumns());
         	  System.out.println(frontYard.getBounds().getMaximumY());
-        	  System.out.println(frontYard.getBounds().getMinimumY());
-        	*/ 
-        	  System.out.println("front yard distance"+Math.abs(frontYard.getBounds().getMaximumY()-frontYard.getBounds().getMinimumY()));
+        	  System.out.println(frontYard.getBounds().getMinimumY());*/
+        	 
+			System.out.println("\n####  Rule 62, 1a ####");
+        	  System.out.println("Front yard distance "+Math.abs(frontYard.getBounds().getMaximumY()-frontYard.getBounds().getMinimumY()));
           }
           
+         
+          
+          List<DXFLWPolyline> side1= util.getPolyLinesByLayer(doc, "Side yard 1");
+          if(side1.size()==1)
+          {
+        	 
+			rearYard = side1.get(0);
+        	/*  System.out.println(frontYard.getColumns());
+        	  System.out.println(frontYard.getBounds().getMaximumY());
+        	  System.out.println(frontYard.getBounds().getMinimumY());
+        	*/ 
+			System.out.println("\n####  Rule 62, (2) ####");
+
+        	  System.out.println("Side yard 1 distance "+Math.abs(rearYard.getBounds().getMaximumX()-rearYard.getBounds().getMinimumX()));
+          }
+          List<DXFLWPolyline> side2= util.getPolyLinesByLayer(doc, "Side yard 2");
+          if(side2.size()==1)
+          {
+        	 
+			rearYard = side2.get(0);
+        	/*  System.out.println(frontYard.getColumns());
+        	  System.out.println(frontYard.getBounds().getMaximumY());
+        	  System.out.println(frontYard.getBounds().getMinimumY());
+        	*/ 
+			System.out.println("\n####  Rule 62, (2) ####");
+
+        	  System.out.println("Side yard 2 distance "+Math.abs(rearYard.getBounds().getMaximumX()-rearYard.getBounds().getMinimumX()));
+          }
           List<DXFLWPolyline> rearYards= util.getPolyLinesByLayer(doc, "Rear yard");
           if(rearYards.size()==1)
           {
@@ -101,54 +185,99 @@ public class J21 {
         	  System.out.println(frontYard.getBounds().getMaximumY());
         	  System.out.println(frontYard.getBounds().getMinimumY());
         	*/ 
-        	  System.out.println("rear yard distance"+Math.abs(rearYard.getBounds().getMaximumY()-rearYard.getBounds().getMinimumY()));
+			System.out.println("\n####  Rule 62, (3) ####");
+
+        	  System.out.println("Rear yard distance "+Math.abs(rearYard.getBounds().getMaximumY()-rearYard.getBounds().getMinimumY()));
           }
           
           
-          
-          
-            // getBlocks(doc);
-            // rule 60 
-            Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
-            System.out.println("Plot Area="+planInfoProperties.get("PLOT_AREA"));
-
-            if(planInfoProperties.get(CRZ_ZONE)!=null)
-	            {
-            	if(planInfoProperties.get(CRZ_ZONE).equalsIgnoreCase("YES"))
-	          	  System.out.println("SITE MARKED UNDER CRZ ZONE. CHECK NOC DURING DOCUMENT SCRUTINY."); 
-            	else
-            		System.out.println("SITE NOT MARKED UNDER CRZ ZONE."); 
-            	
-	          }else
-	          {
-	        	  System.err.println("CRZ ZONE DETAILS NOT MENTIONED"); //TODO: CHECK IS IT MANDATORY.
-	          }
             
-
-            if(Double.valueOf(planInfoProperties.get("PLOT_AREA"))>=125)
-            {
-            	 System.err.println("Plot are less than 125 m2 is violated");
-            }else
-            {
-            	 System.out.println("Plot are less than 125 m2 is accepted");
-            }
-           
-            List<DXFLWPolyline> polyLinesByLayer = util.getPolyLinesByLayer(doc, "Non notified road");
-            DXFLWPolyline nonNotifiedRoad=    polyLinesByLayer.get(0);
-            Bounds   roadBounds=   nonNotifiedRoad.getBounds();
-            roadBounds.debug();
          
-            frontYard.getBounds().debug();
-            rearYard.getBounds().debug();
             
-           
-                
-
-        } catch (Exception e) {
+          } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+//RULE 23 SUBRULE 5
+	private static void validateVoltageLineFromOHEL(DXFDocument doc, Util util) {
+		
+			String voltage= util.getMtextByLayerName(doc, "Voltage");
+            DXFLine horiz_clear_OHE= util.getSingleLineByLayer(doc, "Horiz_clear_OHE");
+            DXFLine vert_clear_OHE= util.getSingleLineByLayer(doc, "Vert_clear_OHE");
+            System.out.println("\n####  Rule 23, 5 ####");
+	         if(Float.valueOf(voltage)>0){
+	            	
+	            if(horiz_clear_OHE.getLength()>0) {	
+	            	if(Float.valueOf(voltage)<11000)
+	            	{
+	            		if(horiz_clear_OHE.getLength()<1.2)
+	        	        	  System.err.println("Horizaontal distance from overhead line violating rules. Distance is "+horiz_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
+	              		else
+	                      {
+	                      	 System.out.println("Horizaontal distance from overhead line "+ horiz_clear_OHE.getLength());
+	                      }
+	            	}
+	            	else if(Float.valueOf(voltage)>=11000 && Float.valueOf(voltage)<=33000)
+	            	{
+	            		if(horiz_clear_OHE.getLength()<1.85)
+	      	        	  System.err.println("Horizaontal distance from overhead line violating rules. Distance is "+horiz_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
+	            		else
+	                    {
+	                    	 System.out.println("Horizaontal distance from overhead line "+ horiz_clear_OHE.getLength());
+	                    }
+	            			
+	            	}else if(Float.valueOf(voltage)>33000)
+	            	{
+	            		
+	            		Double totalHorizontalOHE= 1.85+ 0.3 * (Math.ceil((Float.valueOf(voltage)-33000)/33000));
+	            		if(horiz_clear_OHE.getLength()<totalHorizontalOHE)
+	        	        	  System.err.println("Horizaontal distance from overhead line violating rules. Distance is "+horiz_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
+	              		else
+	                      {
+	                      	 System.out.println("Horizaontal distance from overhead line "+ horiz_clear_OHE.getLength());
+	                      }
+	            	}
+	            		
+	            }else if(vert_clear_OHE.getLength()>0) {	
+	            	if(Float.valueOf(voltage)<11000)
+	            	{
+	            		if(vert_clear_OHE.getLength()<2.4)
+	        	        	  System.err.println("Vertical distance from overhead line violating rules. Distance is "+vert_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
+	              		else
+	                      {
+	                      	 System.out.println("Vertical distance from overhead line "+ vert_clear_OHE.getLength());
+	                      }
+	            	}
+	            	else if(Float.valueOf(voltage)>=11000 && Float.valueOf(voltage)<=33000)
+	            	{
+	            		if(vert_clear_OHE.getLength()<3.7)
+	      	        	  System.err.println("Vertical distance from overhead line violating rules. Distance is "+vert_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
+	            		else
+	                    {
+	                    	 System.out.println("Vertical distance from overhead line "+ vert_clear_OHE.getLength());
+	                    }
+	            			
+	            	}else if(Float.valueOf(voltage)>33000)
+	            	{
+	            		
+	            		Double totalHorizontalOHE= 3.7+ 0.3 * (Math.ceil((Float.valueOf(voltage)-33000)/33000));
+	            		
+	            		if(vert_clear_OHE.getLength()<totalHorizontalOHE)
+	        	        	  System.err.println("Vertical distance from overhead line violating rules. Distance is "+totalHorizontalOHE); //TODO: CHECK IS IT MANDATORY.
+	              		else
+	                      {
+	                      	 System.out.println("Vertical distance from overhead line "+ vert_clear_OHE.getLength());
+	                      }
+	            	}
+	            		
+	            }else
+	          	  System.err.println("Vertical distance/Horizontal distance from overhead line not defined.");
+	            
+	             	
+	           }else
+		          	  System.out.println("Overhead electric voltage details not specified.");//TODO: CHECK MANDATORY
+	}
 
 	private static void getBlocks(DXFDocument doc) {
 		int block=0;

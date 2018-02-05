@@ -197,7 +197,7 @@ public class Util {
 		return dxflwPolylines;
 	}
 
-	private BigDecimal getPolyLineArea(DXFPolyline dxfPolyline) {
+	protected BigDecimal getPolyLineArea(DXFPolyline dxfPolyline) {
 
 		ArrayList x = new ArrayList();
 		ArrayList y = new ArrayList();
@@ -236,6 +236,30 @@ public class Util {
 		return convertedArea.setScale(4, RoundingMode.HALF_UP).abs();
 
 	}
+	
+	 public static	String	getMtextByLayerName(DXFDocument doc, String layerName)
+		{
+		 DXFLayer planInfoLayer = doc.getDXFLayer(layerName);
+			List texts = planInfoLayer.getDXFEntities(DXFConstants.ENTITY_TYPE_MTEXT);
+			String param="";
+			DXFText	text=null;
+			Iterator iterator = texts.iterator();
+			
+			while(iterator.hasNext())
+			{
+				text= (DXFText)iterator.next();
+				if(text!=null && text.getText()!=null ){
+					param=text.getText();
+				/*if(new Float(param).isNaN())	
+				{
+					throw  new RuntimeException("Texts in the layer" + layerName +"Does not follow standard ");
+				}*/
+				
+				param=param.replace("VOLTS", "").trim();
+				}
+			}
+			return param;
+		}
 		
  public static	Map<String,String>	getPlanInfoProperties(DXFDocument doc)
 	{
