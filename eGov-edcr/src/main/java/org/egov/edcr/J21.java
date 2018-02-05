@@ -4,6 +4,7 @@ package org.egov.edcr;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -143,12 +144,25 @@ public class J21 {
         	/*  System.out.println(frontYard.getColumns());
         	  System.out.println(frontYard.getBounds().getMaximumY());
         	  System.out.println(frontYard.getBounds().getMinimumY());*/
-        	 
+        	
+		
+			
+			
 			System.out.println("\n####  Rule 62, 1a ####");
-        	  System.out.println("Front yard distance "+Math.abs(frontYard.getBounds().getMaximumY()-frontYard.getBounds().getMinimumY()));
+			
+			BigDecimal polyLineArea = util.getPolyLineArea(frontYard);
+			BigDecimal mean = polyLineArea.divide(BigDecimal.valueOf(frontYard.getBounds().getWidth()),5,RoundingMode.HALF_UP);
+			System.out.println("Area of the Front yard : "+polyLineArea);
+			System.out.println("Front yard Mean : "+mean);
+			if(mean.compareTo(BigDecimal.valueOf(1.2)) < 0)
+			{
+				System.err.println("Front yard Mean Distance rule violated");
+			}
+        	System.out.println("Front yard distance "+Math.abs(frontYard.getBounds().getMaximumY()-frontYard.getBounds().getMinimumY()));
           }
           
-         
+         BigDecimal sideYard1Mean=BigDecimal.ZERO;
+         BigDecimal sideYard2Mean=BigDecimal.ZERO;
           
           List<DXFLWPolyline> side1= util.getPolyLinesByLayer(doc, "Side yard 1");
           if(side1.size()==1)
@@ -160,7 +174,12 @@ public class J21 {
         	  System.out.println(frontYard.getBounds().getMinimumY());
         	*/ 
 			System.out.println("\n####  Rule 62, (2) ####");
-
+			BigDecimal polyLineArea = util.getPolyLineArea(rearYard);
+			BigDecimal mean = polyLineArea.divide(BigDecimal.valueOf(rearYard.getBounds().getHeight()),5,RoundingMode.HALF_UP);
+			System.out.println("Area of the Side yard : "+polyLineArea);
+			System.out.println("Side yard Mean : "+mean);
+			
+			sideYard1Mean=mean;
         	  System.out.println("Side yard 1 distance "+Math.abs(rearYard.getBounds().getMaximumX()-rearYard.getBounds().getMinimumX()));
           }
           List<DXFLWPolyline> side2= util.getPolyLinesByLayer(doc, "Side yard 2");
@@ -173,9 +192,16 @@ public class J21 {
         	  System.out.println(frontYard.getBounds().getMinimumY());
         	*/ 
 			System.out.println("\n####  Rule 62, (2) ####");
-
+			
+			BigDecimal polyLineArea = util.getPolyLineArea(rearYard);
+			BigDecimal mean= polyLineArea.divide(BigDecimal.valueOf(rearYard.getBounds().getHeight()),5,RoundingMode.HALF_UP);
+			System.out.println("Area of the Side yard 2 : "+polyLineArea);
+			System.out.println("Side yard 2 Mean : "+mean);
+			sideYard2Mean=mean;
         	  System.out.println("Side yard 2 distance "+Math.abs(rearYard.getBounds().getMaximumX()-rearYard.getBounds().getMinimumX()));
           }
+          
+          
           List<DXFLWPolyline> rearYards= util.getPolyLinesByLayer(doc, "Rear yard");
           if(rearYards.size()==1)
           {
@@ -186,7 +212,15 @@ public class J21 {
         	  System.out.println(frontYard.getBounds().getMinimumY());
         	*/ 
 			System.out.println("\n####  Rule 62, (3) ####");
-
+			BigDecimal polyLineArea = util.getPolyLineArea(rearYard);
+			BigDecimal mean = polyLineArea.divide(BigDecimal.valueOf(rearYard.getBounds().getWidth()),5,RoundingMode.HALF_UP);
+			System.out.println("Area of the Rear yard : "+polyLineArea);
+			System.out.println("Rear yard Mean : "+mean);
+			if(mean.compareTo(BigDecimal.valueOf(1)) < 0)
+			{
+				System.err.println("Rear yard Mean Distance rule violated");
+			}
+			
         	  System.out.println("Rear yard distance "+Math.abs(rearYard.getBounds().getMaximumY()-rearYard.getBounds().getMinimumY()));
           }
           
