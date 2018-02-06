@@ -45,6 +45,8 @@ public class J21 {
             //Rule 23 A  
             Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
             System.out.println("\n####  Rule 23, 4 ####");
+            for(int i=1;i<100;i++)
+            {}
             if(planInfoProperties.get(CRZ_ZONE)!=null)
 	            {
             	if(planInfoProperties.get(CRZ_ZONE).equalsIgnoreCase("YES"))
@@ -68,7 +70,11 @@ public class J21 {
 
 			DXFLine line = util.getSingleLineByLayer(doc, "Shortest Distance to road");
 			System.out.println("\n####  Rule 26 ####");
-			System.out.println("Shortest Distance to road : " + line.getLength());
+			if(line!=null)
+				System.out.println("Shortest Distance to road : " + line.getLength());
+				else
+					System.err.println("Shortest Distance to road not defined. ");
+			
 			
 			//line.getBounds().debug();
 			if (nonNotifiedRoad.size() > 0) {
@@ -108,10 +114,16 @@ public class J21 {
         	 
 			rearYard = plotBoundary.get(0);
 
-        	  System.out.println(" Total Area in yards "+ util.getPolyLineArea(rearYard));
+        	  System.out.println("Total Plot Area in Mts "+ util.getPolyLineArea(rearYard));
           }
-                  // System.out.println("Plot Area="+planInfoProperties.get("PLOT_AREA"));
-
+                   System.out.println("As per Plan info Plot Area is : "+planInfoProperties.get("PLOT_AREA"));
+                
+                  if(planInfoProperties.get("PLOT_AREA")!=null &&
+                		  util.getPolyLineArea(rearYard)!=null && 
+                		  (util.getPolyLineArea(rearYard).compareTo(BigDecimal.valueOf(Float.valueOf(planInfoProperties.get("PLOT_AREA"))))>0
+                		  || util.getPolyLineArea(rearYard).compareTo(BigDecimal.valueOf(Float.valueOf(planInfoProperties.get("PLOT_AREA"))))<0))
+                   System.err.println("Plot are is not same as mentioned in plan info.");
+                  
                     if((util.getPolyLineArea(rearYard).compareTo(BigDecimal.valueOf(125))>0))
                     {
                     	 System.err.println("Plot are less than 125 m2 is violated");
@@ -240,11 +252,11 @@ public class J21 {
             DXFLine horiz_clear_OHE= util.getSingleLineByLayer(doc, "Horiz_clear_OHE");
             DXFLine vert_clear_OHE= util.getSingleLineByLayer(doc, "Vert_clear_OHE");
             System.out.println("\n####  Rule 23, 5 ####");
+            System.out.println("Voltage " + voltage);
 	         if(Float.valueOf(voltage)>0){
 	            	
-	            if(horiz_clear_OHE.getLength()>0) {	
-	            	if(Float.valueOf(voltage)<11000)
-	            	{
+			if (horiz_clear_OHE != null && horiz_clear_OHE.getLength() > 0) {
+				if (Float.valueOf(voltage) < 11000) {
 	            		if(horiz_clear_OHE.getLength()<1.2)
 	        	        	  System.err.println("Horizaontal distance from overhead line violating rules. Distance is "+horiz_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
 	              		else
@@ -273,9 +285,8 @@ public class J21 {
 	                      }
 	            	}
 	            		
-	            }else if(vert_clear_OHE.getLength()>0) {	
-	            	if(Float.valueOf(voltage)<11000)
-	            	{
+			} else if (vert_clear_OHE != null && vert_clear_OHE.getLength() > 0) {
+				if (Float.valueOf(voltage) < 11000) {
 	            		if(vert_clear_OHE.getLength()<2.4)
 	        	        	  System.err.println("Vertical distance from overhead line violating rules. Distance is "+vert_clear_OHE.getLength()); //TODO: CHECK IS IT MANDATORY.
 	              		else
