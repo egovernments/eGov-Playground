@@ -20,6 +20,7 @@ import org.kabeja.dxf.helpers.Point;
 
 public class Util {
 	private static String FLOOR_NAME_PREFIX = "FLOOR_";
+	private static final int DECIMALDIGITS = 10;
 
 	public List<DXFLWPolyline> getPolyLinesByColor(DXFDocument dxfDocument, Integer colorCode) {
 
@@ -357,6 +358,17 @@ public class Util {
 		}
 
 		return i;
+	}
+
+	public boolean pointsEquals(Point point1, Point point) {
+		BigDecimal px=BigDecimal.valueOf(point.getX()).setScale(DECIMALDIGITS, BigDecimal.ROUND_DOWN);
+		BigDecimal py=BigDecimal.valueOf(point.getY()).setScale(DECIMALDIGITS, BigDecimal.ROUND_DOWN);
+		BigDecimal p1x=BigDecimal.valueOf(point1.getX()).setScale(DECIMALDIGITS, BigDecimal.ROUND_DOWN);
+		BigDecimal p1y=BigDecimal.valueOf(point1.getY()).setScale(DECIMALDIGITS, BigDecimal.ROUND_DOWN);
+		if(px.compareTo(p1x)==0 && py.compareTo(p1y)==0)
+			return true;
+		else 
+			return false;
 	}
 
 }

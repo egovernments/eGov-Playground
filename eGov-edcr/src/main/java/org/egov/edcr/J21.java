@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.edcr.math.RayCast;
+import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFDocument;
+import org.kabeja.dxf.DXFEntity;
 import org.kabeja.dxf.DXFLWPolyline;
+import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
 import org.kabeja.dxf.DXFVertex;
 import org.kabeja.dxf.helpers.Point;
@@ -25,9 +28,22 @@ import org.springframework.util.ResourceUtils;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 public class J21 {
+	private static final String VERT_CLEAR_OHE = "VERT_CLEAR_OHE";
+	private static final String REAR_YARD = "REAR_YARD";
+	private static final String BUILDING_FOOT_PRINT = "BUILDING_FOOTPRINT";
+	private static final String SIDE_YARD_2 = "SIDE_YARD_2";
+	private static final String SIDE_YARD_1 = "SIDE_YARD_1";
+	private static final String FRONT_YARD = "FRONT_YARD";
+	private static final String NOTIFIED_ROADS = "NOTIFIED_ROADS";
+	private static final String NON_NOTIFIED_ROAD = "NON_NOTIFIED_ROAD";
+	private static final String HORIZ_CLEAR_OHE2 = "HORIZ_CLEAR_OHE";
+	private static final String PLOT_BOUNDARY = "PLOT_BOUNDARY";
+	private static final String VOLTAGE = "VOLTAGE";
 	private static Integer FLOOR_COLOUR_CODE = 10;
-	private static String LAYER_NAME_WASTE_DISPOSAL = "Waste disposal";
+	private static String LAYER_NAME_WASTE_DISPOSAL = "WASTE_DISPOSAL";
 	private static String CRZ_ZONE = "CRZ_ZONE";
+	private static final int DECIMALDIGITS = 10;
+	
 
 	public static void main(String[] args) {
 
@@ -35,7 +51,7 @@ public class J21 {
 
 		try {
 			// File Path
-			File file = ResourceUtils.getFile("classpath:dxf/kj23.dxf");
+			File file = ResourceUtils.getFile("classpath:dxf/SAMPLE 3.dxf");
 			String path = file.getPath();
 
 			// Parse DXF File
@@ -43,7 +59,8 @@ public class J21 {
 
 			// Extract DXF Data
 			DXFDocument doc = parser.getDocument();
-
+			
+		
 			// getHeightOfTheBuilding(doc);
 			Util util = new Util();
 			// System.out.println("Total Floors " +
@@ -73,8 +90,8 @@ public class J21 {
 			}
 			// rule 26
 
-			List<DXFLWPolyline> nonNotifiedRoad = util.getPolyLinesByLayer(doc, "Non notified road");
-			List<DXFLWPolyline> notifiedRoad = util.getPolyLinesByLayer(doc, "Notified roads");
+			List<DXFLWPolyline> nonNotifiedRoad = util.getPolyLinesByLayer(doc, NON_NOTIFIED_ROAD);
+			List<DXFLWPolyline> notifiedRoad = util.getPolyLinesByLayer(doc, NOTIFIED_ROADS);
 
 			DXFLine line = util.getSingleLineByLayer(doc, "Shortest Distance to road");
 			System.out.println("\n####  Rule 26 ####");
@@ -119,7 +136,7 @@ public class J21 {
 			// Rule 60
 			System.out.println("\n####  Rule 60 ####");
 
-			List<DXFLWPolyline> plotBoundary = util.getPolyLinesByLayer(doc, "Plot boundary");
+			List<DXFLWPolyline> plotBoundary = util.getPolyLinesByLayer(doc, PLOT_BOUNDARY);
 			if (plotBoundary.size() == 1) {
 
 				rearYard = plotBoundary.get(0);
@@ -154,7 +171,7 @@ public class J21 {
 
 			DXFLWPolyline frontYard = null;
 
-			List<DXFLWPolyline> frontYardLines = util.getPolyLinesByLayer(doc, "Front yard");
+			List<DXFLWPolyline> frontYardLines = util.getPolyLinesByLayer(doc, FRONT_YARD);
 			if (frontYardLines.size() == 1) {
 
 				frontYard = frontYardLines.get(0);
@@ -171,7 +188,7 @@ public class J21 {
 						RoundingMode.HALF_UP);
 				System.out.println("Area of the Front yard : " + polyLineArea);
 				System.out.println("Front yard Mean : " + mean);
-				 System.out.println("Front Yard Min Distance "+getYardMinDistance(doc, "Front yard"));
+				 System.out.println("Front Yard Min Distance "+getYardMinDistance(doc, FRONT_YARD));
 				if (mean.compareTo(BigDecimal.valueOf(1.2)) < 0) {
 					System.err.println("Front yard Mean Distance rule violated");
 				}
@@ -181,7 +198,7 @@ public class J21 {
 			BigDecimal sideYard1Mean = BigDecimal.ZERO;
 			BigDecimal sideYard2Mean = BigDecimal.ZERO;
 
-			List<DXFLWPolyline> side1 = util.getPolyLinesByLayer(doc, "Side yard 1");
+			List<DXFLWPolyline> side1 = util.getPolyLinesByLayer(doc, SIDE_YARD_1);
 			if (side1.size() == 1) {
 
 				rearYard = side1.get(0);
@@ -204,14 +221,14 @@ public class J21 {
 				System.out.println("Side yard Mean : " + mean);
 				
 				  Double sideyard1MinDistance = getYardMinDistance(doc,
-				 "Side yard 1"); System.out.println(
+				 SIDE_YARD_1); System.out.println(
 				 "Side yard 1 Min Distance "+sideyard1MinDistance);
-				
+			
 
 				sideYard1Mean = mean;
 				 
 			}
-			List<DXFLWPolyline> side2 = util.getPolyLinesByLayer(doc, "Side yard 2");
+			List<DXFLWPolyline> side2 = util.getPolyLinesByLayer(doc, SIDE_YARD_2);
 			if (side2.size() == 1) {
 
 				rearYard = side2.get(0);
@@ -229,15 +246,15 @@ public class J21 {
 				System.out.println("Side yard 2 Mean : " + mean);
 
 				
-				  Double sideyard2MinDistance = getYardMinDistance(doc,
-				  "Side yard 2"); System.out.println(
+				 Double sideyard2MinDistance = getYardMinDistance(doc,
+				  SIDE_YARD_2); System.out.println(
 				  "Side yard 2 Min Distance "+sideyard2MinDistance);
 				 
 				sideYard2Mean = mean;
 				 
 			}
 
-			List<DXFLWPolyline> rearYards = util.getPolyLinesByLayer(doc, "Rear yard");
+			List<DXFLWPolyline> rearYards = util.getPolyLinesByLayer(doc, REAR_YARD);
 			if (rearYards.size() == 1) {
 
 				rearYard = rearYards.get(0);
@@ -252,7 +269,7 @@ public class J21 {
 						RoundingMode.HALF_UP);
 				System.out.println("Area of the Rear yard : " + polyLineArea);
 				System.out.println("Rear yard Mean : " + mean);
-				System.out.println("Rear Yard Min Distance " + getYardMinDistance(doc, "Rear yard"));
+				System.out.println("Rear Yard Min Distance " + getYardMinDistance(doc, REAR_YARD));
 				if (mean.compareTo(BigDecimal.valueOf(1)) < 0) {
 					System.err.println("Rear yard Mean Distance rule violated");
 				}
@@ -268,20 +285,20 @@ public class J21 {
 
 	private static Double getYardMinDistance(DXFDocument doc, String name) {
 		Util util = new Util();
-		List<DXFLWPolyline> polyLinesByLayer = util.getPolyLinesByLayer(doc, "Plot boundary");
+		List<DXFLWPolyline> polyLinesByLayer = util.getPolyLinesByLayer(doc, PLOT_BOUNDARY);
 		DXFLWPolyline plotBoundary = polyLinesByLayer.get(0);
 
-		List<DXFLWPolyline> polyLinesByLayer1 = util.getPolyLinesByLayer(doc, "Building foot print");
+		List<DXFLWPolyline> polyLinesByLayer1 = util.getPolyLinesByLayer(doc, BUILDING_FOOT_PRINT);
 		DXFLWPolyline buildFoorPrint = polyLinesByLayer1.get(0);
 		// DXFLWPolyline buildFoorPrint1 = polyLinesByLayer1.get(1);
 		int rows = buildFoorPrint.getRows();
 
 		List<DXFLWPolyline> polyLinesByLayer2 = util.getPolyLinesByLayer(doc, name);
 		DXFLWPolyline yard = polyLinesByLayer2.get(0);
-		System.out.println("vertex count"+yard.getVertexCount()+"and contains curve"+yard.isCurveFitVerticesAdded());
-		System.out.println("Yard :isClosed"+yard.isClosed());
-		System.out.println("Plot :isClosed"+plotBoundary.isClosed());
-		System.out.println("Building :isClosed"+buildFoorPrint.isClosed());
+	/*	System.out.println("vertex count"+yard.getVertexCount()+"and contains curve"+yard.isCurveFitVerticesAdded()); */
+		System.out.println(name+" -isClosed :"+yard.isClosed());
+		System.out.println("Plot - isClosed :"+plotBoundary.isClosed());
+		System.out.println("Building -isClosed :"+buildFoorPrint.isClosed());
 
 		Iterator vertexIterator = yard.getVertexIterator();
 		List<Point> yardOutSidePoints = new ArrayList<>();
@@ -289,7 +306,8 @@ public class J21 {
 		List<Double> distanceList = new ArrayList<>();
 		int i = 0;
 		Iterator plotBIterator1 = plotBoundary.getVertexIterator();
-		double[][] shape = new double[100][2];
+	int count=	plotBoundary.getVertexCount();
+		double[][] shape = new double[count+1][2];
 		while (plotBIterator1.hasNext()) {
 
 			DXFVertex dxfVertex = (DXFVertex) plotBIterator1.next();
@@ -298,10 +316,24 @@ public class J21 {
 			shape[i][0] = point1.getX();
 			shape[i][1] = point1.getY();
 
-			System.out.println(name+"===Shape=="+shape[i][0]+"--"+shape[i][1]);
+			//System.out.println(name+"===Shape=="+shape[i][0]+"--"+shape[i][1]);
 			i++;
 
 		}
+		shape[i]=shape[0];
+	//	System.out.println(name+"===Shape=="+shape[i][0]+"--"+shape[i][1]);
+		
+		
+		
+		DXFDocument doc1 = new DXFDocument();
+		DXFLayer layer=new DXFLayer();
+	 
+		layer.addDXFEntity(plotBoundary);
+		doc1.addDXFLayer(layer);
+		doc1.toString();
+		
+
+	System.out.println("flags"+	plotBoundary.getFlags());
 		 
 		while (vertexIterator.hasNext()) {
 			DXFVertex next = (DXFVertex) vertexIterator.next();
@@ -316,16 +348,15 @@ public class J21 {
 				DXFVertex dxfVertex = (DXFVertex) plotBIterator.next();
 				Point point1 = dxfVertex.getPoint();
 
-				// System.out.println("Outside
-				// :"+point1.getX()+","+point1.getY());
-				if (point.equals(point1)) {
+				// System.out.println("Outside				 :"+point1.getX()+","+point1.getY());
+				if (util.pointsEquals(point1,point)) {
 					System.out.println(name+" adding on points on a plot boundary Point ---"+point.getX()+","+point.getY());
 					yardOutSidePoints.add(point);
 
 					break outside;
 				}
 			}
-		 	if(name.contains("Side"))
+		 	if(name.contains("side"))
 			{
 				if (RayCast.containsSide(shape, new double[] { point.getX(), point.getY() }) == true) {
 
@@ -342,10 +373,10 @@ public class J21 {
 			
 			if (RayCast.contains(shape, new double[] { point.getX(), point.getY() }) == true) {
 
-				// System.out.println(yardOutSidePoints+"---"+!yardOutSidePoints.contains(point));
+				 System.out.println(yardOutSidePoints+"---"+!yardOutSidePoints.contains(point));
 
 				if (!yardOutSidePoints.contains(point)) {
-					System.out.println(name+" adding point on a   plot Boundary line ---"+point.getX()+","+point.getY());
+					System.out.println(name+" adding point on a   plot Boundary line using raycast---"+point.getX()+","+point.getY());
 					yardOutSidePoints.add(point);
 				}
 			}
@@ -358,12 +389,10 @@ public class J21 {
 
 				DXFVertex dxfVertex = (DXFVertex) footPrintIterator.next();
 				Point point1 = dxfVertex.getPoint();
-				// System.out.println("Foot Print
-				// :"+point1.getX()+","+point1.getY());
-				if (point.equals(point1)) {
+				 System.out.println("Foot Print  :"+point1.getX()+","+point1.getY());
+				if (util.pointsEquals(point1,point)) {
 					yardInSidePoints.add(point);
-					// System.out.println("Inside
-					// :"+point.getX()+","+point.getY());
+					 System.out.println("Inside	 :"+point.getX()+","+point.getY());
 					break inside;
 				}
 			}
@@ -393,19 +422,26 @@ public class J21 {
 		{
 			for(Point p1:yardInSidePoints)
 			{
-				if(p.equals(p1))
+				if(util.pointsEquals(p1,p))
 				{
-					toremove.add(p1);
+					toremove.add(p);
 				}
 			}
 			System.out.println(p.getX()+","+p.getY());
 		}
-		
+		System.out.println(name+"   Outside Points-------------");
 		for(Point p:toremove)
 		{
 			yardOutSidePoints.remove(p);
+			System.out.println(name+"   remove Points-------------"+p.getX()+",,,,"+p.getY());	
 		}
 		
+		
+		for(Point p:yardOutSidePoints)
+		{
+			 
+			System.out.println(p.getX()+","+p.getY());
+		}
 		
 		System.out.println(name+"   Inside Points-------------");
 		
@@ -415,22 +451,23 @@ public class J21 {
 		}
 		
 		List<Point> outsidePoints = findPointsOnPolylines(yardOutSidePoints);
-		
+		System.out.println(outsidePoints.size());
 		List<Point> insidePoints = findPointsOnPolylines(yardInSidePoints);
+		System.out.println(insidePoints.size());
 		
 		for (Point in : insidePoints) {
-			// System.out.println("Inside : "+in.getX()+","+in.getY());
+			 //System.out.println("Inside : "+in.getX()+","+in.getY());
 			for (Point out : outsidePoints) {
-				// System.out.println("Outside : "+out.getX()+","+out.getY());
+			// System.out.println("Outside : "+out.getX()+","+out.getY());
 				double distance = MathUtils.distance(in, out);
-				// System.out.println("Distance : "+distance);
+			//	 System.out.println("Distance : "+distance);
 				distanceList.add(distance);
 
 			}
 		}
 		
-		
-	/*	for (Point in : yardInSidePoints) {
+	/*	
+		for (Point in : yardInSidePoints) {
 			// System.out.println("Inside : "+in.getX()+","+in.getY());
 			for (Point out : yardOutSidePoints) {
 				// System.out.println("Outside : "+out.getX()+","+out.getY());
@@ -439,8 +476,8 @@ public class J21 {
 				distanceList.add(distance);
 
 			}
-		}
-*/
+		}*/
+
 		//System.out.println(distanceList);
 		java.util.Collections.sort(distanceList);
 		//System.out.println("the shortest Distance is " + distanceList.get(0));
@@ -494,9 +531,9 @@ public class J21 {
 	// RULE 23 SUBRULE 5
 	private static void validateVoltageLineFromOHEL(DXFDocument doc, Util util) {
 
-		String voltage = util.getMtextByLayerName(doc, "Voltage");
-		DXFLine horiz_clear_OHE = util.getSingleLineByLayer(doc, "Horiz_clear_OHE");
-		DXFLine vert_clear_OHE = util.getSingleLineByLayer(doc, "Vert_clear_OHE");
+		String voltage = util.getMtextByLayerName(doc, VOLTAGE);
+		DXFLine horiz_clear_OHE = util.getSingleLineByLayer(doc, HORIZ_CLEAR_OHE2);
+		DXFLine vert_clear_OHE = util.getSingleLineByLayer(doc, VERT_CLEAR_OHE);
 		System.out.println("\n####  Rule 23, 5 ####");
 		System.out.println("Voltage " + voltage);
 		if (Float.valueOf(voltage) > 0) {
