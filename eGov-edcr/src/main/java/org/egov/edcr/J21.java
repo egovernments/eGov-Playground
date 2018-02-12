@@ -5,15 +5,12 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.edcr.math.RayCast;
-import org.kabeja.dxf.Bounds;
 import org.kabeja.dxf.DXFDocument;
-import org.kabeja.dxf.DXFEntity;
 import org.kabeja.dxf.DXFLWPolyline;
 import org.kabeja.dxf.DXFLayer;
 import org.kabeja.dxf.DXFLine;
@@ -23,9 +20,8 @@ import org.kabeja.math.MathUtils;
 import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
+import org.springframework.util.NumberUtils;
 import org.springframework.util.ResourceUtils;
-
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 public class J21 {
 	private static final String VERT_CLEAR_OHE = "VERT_CLEAR_OHE";
@@ -51,7 +47,7 @@ public class J21 {
 
 		try {
 			// File Path
-			File file = ResourceUtils.getFile("classpath:dxf/SAMPLE 3.dxf");
+			File file = ResourceUtils.getFile("classpath:dxf/SAMPLE 4.dxf");
 			String path = file.getPath();
 
 			// Parse DXF File
@@ -296,9 +292,9 @@ public class J21 {
 		List<DXFLWPolyline> polyLinesByLayer2 = util.getPolyLinesByLayer(doc, name);
 		DXFLWPolyline yard = polyLinesByLayer2.get(0);
 	/*	System.out.println("vertex count"+yard.getVertexCount()+"and contains curve"+yard.isCurveFitVerticesAdded()); */
-		System.out.println(name+" -isClosed :"+yard.isClosed());
+		/*System.out.println(name+" -isClosed :"+yard.isClosed());
 		System.out.println("Plot - isClosed :"+plotBoundary.isClosed());
-		System.out.println("Building -isClosed :"+buildFoorPrint.isClosed());
+		System.out.println("Building -isClosed :"+buildFoorPrint.isClosed());*/
 
 		Iterator vertexIterator = yard.getVertexIterator();
 		List<Point> yardOutSidePoints = new ArrayList<>();
@@ -333,12 +329,12 @@ public class J21 {
 		doc1.toString();
 		
 
-	System.out.println("flags"+	plotBoundary.getFlags());
+//	System.out.println("flags"+	plotBoundary.getFlags());
 		 
 		while (vertexIterator.hasNext()) {
 			DXFVertex next = (DXFVertex) vertexIterator.next();
 			Point point = next.getPoint();
-			 System.out.println("yard Point :"+point.getX()+","+point.getY());
+			// System.out.println("yard Point :"+point.getX()+","+point.getY());
 
 			Iterator plotBIterator = plotBoundary.getVertexIterator();
 
@@ -350,7 +346,7 @@ public class J21 {
 
 				// System.out.println("Outside				 :"+point1.getX()+","+point1.getY());
 				if (util.pointsEquals(point1,point)) {
-					System.out.println(name+" adding on points on a plot boundary Point ---"+point.getX()+","+point.getY());
+					//System.out.println(name+" adding on points on a plot boundary Point ---"+point.getX()+","+point.getY());
 					yardOutSidePoints.add(point);
 
 					break outside;
@@ -373,10 +369,10 @@ public class J21 {
 			
 			if (RayCast.contains(shape, new double[] { point.getX(), point.getY() }) == true) {
 
-				 System.out.println(yardOutSidePoints+"---"+!yardOutSidePoints.contains(point));
+				// System.out.println(yardOutSidePoints+"---"+!yardOutSidePoints.contains(point));
 
 				if (!yardOutSidePoints.contains(point)) {
-					System.out.println(name+" adding point on a   plot Boundary line using raycast---"+point.getX()+","+point.getY());
+					//System.out.println(name+" adding point on a   plot Boundary line using raycast---"+point.getX()+","+point.getY());
 					yardOutSidePoints.add(point);
 				}
 			}
@@ -389,10 +385,10 @@ public class J21 {
 
 				DXFVertex dxfVertex = (DXFVertex) footPrintIterator.next();
 				Point point1 = dxfVertex.getPoint();
-				 System.out.println("Foot Print  :"+point1.getX()+","+point1.getY());
+				// System.out.println("Foot Print  :"+point1.getX()+","+point1.getY());
 				if (util.pointsEquals(point1,point)) {
 					yardInSidePoints.add(point);
-					 System.out.println("Inside	 :"+point.getX()+","+point.getY());
+					// System.out.println("Inside	 :"+point.getX()+","+point.getY());
 					break inside;
 				}
 			}
@@ -417,7 +413,7 @@ public class J21 {
 		 */
 		List<Point> toremove=new ArrayList<>();
 		
-		System.out.println(name+"   Outside Points-------------");
+		//System.out.println(name+"   Outside Points-------------");
 		for(Point p:yardOutSidePoints)
 		{
 			for(Point p1:yardInSidePoints)
@@ -427,33 +423,33 @@ public class J21 {
 					toremove.add(p);
 				}
 			}
-			System.out.println(p.getX()+","+p.getY());
+			//System.out.println(p.getX()+","+p.getY());
 		}
-		System.out.println(name+"   Outside Points-------------");
+		//System.out.println(name+"   Outside Points-------------");
 		for(Point p:toremove)
 		{
 			yardOutSidePoints.remove(p);
-			System.out.println(name+"   remove Points-------------"+p.getX()+",,,,"+p.getY());	
+			//System.out.println(name+"   remove Points-------------"+p.getX()+",,,,"+p.getY());	
 		}
 		
 		
 		for(Point p:yardOutSidePoints)
 		{
 			 
-			System.out.println(p.getX()+","+p.getY());
+			//System.out.println(p.getX()+","+p.getY());
 		}
 		
-		System.out.println(name+"   Inside Points-------------");
+		//System.out.println(name+"   Inside Points-------------");
 		
 		for(Point p:yardInSidePoints)
 		{
-			System.out.println(p.getX()+","+p.getY());
+			//System.out.println(p.getX()+","+p.getY());
 		}
 		
 		List<Point> outsidePoints = findPointsOnPolylines(yardOutSidePoints);
-		System.out.println(outsidePoints.size());
+		//System.out.println(outsidePoints.size());
 		List<Point> insidePoints = findPointsOnPolylines(yardInSidePoints);
-		System.out.println(insidePoints.size());
+		//System.out.println(insidePoints.size());
 		
 		for (Point in : insidePoints) {
 			 //System.out.println("Inside : "+in.getX()+","+in.getY());
@@ -536,7 +532,14 @@ public class J21 {
 		DXFLine vert_clear_OHE = util.getSingleLineByLayer(doc, VERT_CLEAR_OHE);
 		System.out.println("\n####  Rule 23, 5 ####");
 		System.out.println("Voltage " + voltage);
-		if (Float.valueOf(voltage) > 0) {
+		Float voltf=null;
+		  try {
+			voltf=Float.valueOf(voltage);
+		} catch (NumberFormatException e) {
+			System.err.println("Voltage contains non numeric value "+voltage+". Cannot validate voltage."); 
+		}
+
+		if (voltf!=null && voltf > 0) {
 
 			if (horiz_clear_OHE != null && horiz_clear_OHE.getLength() > 0) {
 				if (Float.valueOf(voltage) < 11000) {
