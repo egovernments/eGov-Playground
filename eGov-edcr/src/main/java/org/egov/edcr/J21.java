@@ -3,24 +3,24 @@ package org.egov.edcr;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.edcr.math.Polygon;
+import org.egov.edcr.math.Ray;
 import org.egov.edcr.math.RayCast;
 import org.kabeja.dxf.DXFDocument;
 import org.kabeja.dxf.DXFLWPolyline;
 import org.kabeja.dxf.DXFLayer;
-import org.kabeja.dxf.DXFLine;
 import org.kabeja.dxf.DXFVertex;
 import org.kabeja.dxf.helpers.Point;
 import org.kabeja.math.MathUtils;
 import org.kabeja.parser.DXFParser;
 import org.kabeja.parser.Parser;
 import org.kabeja.parser.ParserBuilder;
-import org.springframework.util.NumberUtils;
 import org.springframework.util.ResourceUtils;
 
 public class J21 {
@@ -39,16 +39,36 @@ public class J21 {
 	private static String LAYER_NAME_WASTE_DISPOSAL = "WASTE_DISPOSAL";
 	private static String CRZ_ZONE = "CRZ_ZONE";
 	private static final int DECIMALDIGITS = 10;
-	
+	private static HashMap<String, HashMap<String, Object>> reportOutput = new HashMap<String, HashMap<String, Object>>();
+    private static HashMap<String, String> errors = new HashMap<String, String>();
+    private static HashMap<String, String> generalInformation = new HashMap<String, String>();
+
+
 
 	public static void main(String[] args) {
 
 		Parser parser = ParserBuilder.createDefaultParser();
-
+		HashMap<String, Object> wasteDisposal = new HashMap<String, Object>();
+		 wasteDisposal.put("WASTEDISPOSALNOTDEFINED",
+                "Waster disposal not defined.");
+			HashMap<String, Object> noticedroad = new HashMap<String, Object>();
+			noticedroad.put("NOTIFIEDROAD",
+	                "Notified road not defined.");
+         reportOutput.put("RULE26", wasteDisposal);
+         
+         if(reportOutput.containsKey("RULE26"))
+         {
+             reportOutput.get("RULE26").put("RULE26", noticedroad);
+         }
+        // reportOutput.put("RULE26", noticedroad);
+         System.out.println(reportOutput);
 		try {
 			// File Path
-			File file = ResourceUtils.getFile("classpath:dxf/SAMPLE 4.dxf");
+			File file = ResourceUtils.getFile("/home/mani/Desktop/BPA/kozhi/Sample_17-03-03-18.dxf");
 			String path = file.getPath();
+			
+			
+			
 
 			// Parse DXF File
 			parser.parse(path, DXFParser.DEFAULT_ENCODING);
@@ -59,11 +79,121 @@ public class J21 {
 		
 			// getHeightOfTheBuilding(doc);
 			Util util = new Util();
+			
+			
+			
+			
+			List<DXFLWPolyline> residentialUnit= new ArrayList<DXFLWPolyline>();
+			   Map<String,BigDecimal> unitWiseDeduction= new HashMap<String,BigDecimal>();
+			   List<DXFLWPolyline> residentialUnitDeduction= new ArrayList<DXFLWPolyline>();
+			   List<DXFLWPolyline> parking= new ArrayList<DXFLWPolyline>();
+			   boolean layerPresent=true;
+			
+			  
+			   layerPresent=doc.containsDXFLayer( "RESI_UNIT");
+			    
+			   if(layerPresent) {
+			    List<DXFLWPolyline> bldgext = Util.getPolyLinesByLayer(doc, "RESI_UNIT");
+				
+		        if (!bldgext.isEmpty())
+		            for (DXFLWPolyline pline : bldgext){
+		            	 
+		            	
+		            	residentialUnit.add(pline);
+		            	System.out.println("RESI_UNIT area " + Util.getPolyLineArea(pline));
+		            }
+			   }
+			   layerPresent=doc.containsDXFLayer( "RESI_UNIT_DEDUCT");
+			   if(layerPresent) {
+		        List<DXFLWPolyline> bldDeduct = Util.getPolyLinesByLayer(doc, "RESI_UNIT_DEDUCT");
+		        if (!bldDeduct.isEmpty())
+		            for (DXFLWPolyline pline : bldDeduct){
+		            	residentialUnitDeduction.add(pline);
+		              	System.out.println("RESI_UNIT_DEDUCT area " + Util.getPolyLineArea(pline));
+		            }
+			   }
+			   
+			    Ray RAY_CASTING = new Ray(
+                       new org.egov.edcr.math.Point(-1.123456789, -1.987654321));
+			   int i=0;
+			   for (DXFLWPolyline resUnit :residentialUnit )
+			   {
+				   i++;
+				   double[][] pointsOfPlot = util.pointsOfPolygon(resUnit);
+				   Iterator vertexIterator = resUnit.getVertexIterator();
+				   List<org.egov.edcr.math.Point> points=new ArrayList<>();
+				   while(vertexIterator.hasNext())
+	            	 {
+	            		 DXFVertex next =(DXFVertex) vertexIterator.next();
+	            		 org.egov.edcr.math.Point p=new org.egov.edcr.math.Point(next.getX(), next.getY());
+	            		 points.add(p);
+	            	 }
+				   
+				   Polygon polygon=new Polygon(points);
+				   
+				  // System.out.println("resunit points----"+pointsOfPlot);
+				   BigDecimal deduction=BigDecimal.ZERO;
+				   for (DXFLWPolyline residentialDeduct: residentialUnitDeduction) {
+					    boolean contains=false;
+				        Iterator buildingIterator =residentialDeduct.getVertexIterator();
+				        while (buildingIterator.hasNext()) {
+			            DXFVertex dxfVertex = (DXFVertex) buildingIterator.next();
+			            Point point = dxfVertex.getPoint();
+			            org.egov.edcr.math.Point point1=new org.egov.edcr.math.Point(point.getX(), point.getY());
+			           if( RAY_CASTING.contains(point1, polygon))
+			           {
+			        	   contains=true;
+			           }
+			            
+			         //   System.out.println(point.getX()+","+point.getY());
+				         /*   if (RayCast.contains(pointsOfPlot, new double[]{point.getX(), point.getY()}) == true) {
+				            	contains=true;
+				            }*/
+				        }
+				        if(contains)
+				        {
+				        	System.out.println("current deduct"+deduction+"    :add deduct for rest unit "+i+"area added"+Util.getPolyLineArea(residentialDeduct));
+				        	deduction=deduction.add(Util.getPolyLineArea(residentialDeduct));
+				        }
+				        
+			        }
+				   unitWiseDeduction.put("resUnit"+i, deduction);
+				   
+				   
+				  
+				   
+			   }
+			   System.out.println(" dedutction for each key ----  " + unitWiseDeduction);
+			   
+			   		
+			   
+			   
+			   
+			   layerPresent=doc.containsDXFLayer( "PARKING_SLOT");
+
+			   if(layerPresent) {
+		        List<DXFLWPolyline> bldparking = Util.getPolyLinesByLayer(doc, "PARKING_SLOT");
+		        if (!bldparking.isEmpty())
+		            for (DXFLWPolyline pline : bldparking){
+		            	parking.add(pline);
+		            	System.out.println("parking " + Util.getPolyLineArea(pline));
+		            }
+			   }
+		        	System.out.println("residentialUnit" + residentialUnit.size());
+		        	System.out.println("residentialUnitDeduction" + residentialUnitDeduction.size());
+		        	System.out.println("parking" + parking.size());
+
+	        
+	        
+	        
+			
+			
+			
 			// System.out.println("Total Floors " +
 			// util.getFloorCountExcludingCeller(doc,FLOOR_COLOUR_CODE));
 
 			// Rule 23 A
-			Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
+		/*	Map<String, String> planInfoProperties = util.getPlanInfoProperties(doc);
 			System.out.println("\n####  Rule 23, 4 ####");
 			for (int i = 1; i < 100; i++) {
 			}
@@ -171,11 +301,11 @@ public class J21 {
 			if (frontYardLines.size() == 1) {
 
 				frontYard = frontYardLines.get(0);
-				/*
+				
 				 * System.out.println(frontYard.getColumns());
 				 * System.out.println(frontYard.getBounds().getMaximumY());
 				 * System.out.println(frontYard.getBounds().getMinimumY());
-				 */
+				 
 
 				System.out.println("\n####  Rule 62, 1a ####");
 
@@ -198,17 +328,17 @@ public class J21 {
 			if (side1.size() == 1) {
 
 				rearYard = side1.get(0);
-			/*	System.out.println("Min Width: "
+				System.out.println("Min Width: "
 				+rearYard.getStartWidth()+"--Elevation---"+rearYard.getElevation()
 				+"--"+rearYard.getContstantWidth()
 				+"---"+rearYard.getPolyFaceMeshVertex(1)
 				+"----"+read);
-				*/
-				/*
+				
+				
 				 * System.out.println(frontYard.getColumns());
 				 * System.out.println(frontYard.getBounds().getMaximumY());
 				 * System.out.println(frontYard.getBounds().getMinimumY());
-				 */
+				 
 				System.out.println("\n####  Rule 62, (2) ####");
 				BigDecimal polyLineArea = util.getPolyLineArea(rearYard);
 				BigDecimal mean = polyLineArea.divide(BigDecimal.valueOf(rearYard.getBounds().getHeight()), 5,
@@ -228,11 +358,11 @@ public class J21 {
 			if (side2.size() == 1) {
 
 				rearYard = side2.get(0);
-				/*
+				
 				 * System.out.println(frontYard.getColumns());
 				 * System.out.println(frontYard.getBounds().getMaximumY());
 				 * System.out.println(frontYard.getBounds().getMinimumY());
-				 */
+				 
 				System.out.println("\n####  Rule 62, (2) ####");
 
 				BigDecimal polyLineArea = util.getPolyLineArea(rearYard);
@@ -248,17 +378,17 @@ public class J21 {
 				 
 				sideYard2Mean = mean;
 				 
-			}
+			}*/
 
-			List<DXFLWPolyline> rearYards = util.getPolyLinesByLayer(doc, REAR_YARD);
+		/*	List<DXFLWPolyline> rearYards = util.getPolyLinesByLayer(doc, REAR_YARD);
 			if (rearYards.size() == 1) {
 
 				rearYard = rearYards.get(0);
-				/*
+				
 				 * System.out.println(frontYard.getColumns());
 				 * System.out.println(frontYard.getBounds().getMaximumY());
 				 * System.out.println(frontYard.getBounds().getMinimumY());
-				 */
+				 
 				System.out.println("\n####  Rule 62, (3) ####");
 				BigDecimal polyLineArea = util.getPolyLineArea(rearYard);
 				BigDecimal mean = polyLineArea.divide(BigDecimal.valueOf(rearYard.getBounds().getWidth()), 5,
@@ -271,7 +401,7 @@ public class J21 {
 				}
 
 				 
-			}
+			}*/
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -525,7 +655,7 @@ public class J21 {
 	}
 
 	// RULE 23 SUBRULE 5
-	private static void validateVoltageLineFromOHEL(DXFDocument doc, Util util) {
+	private static void validateVoltageLineFromOHEL(DXFDocument doc, Util util) {/*
 
 		String voltage = util.getMtextByLayerName(doc, VOLTAGE);
 		DXFLine horiz_clear_OHE = util.getSingleLineByLayer(doc, HORIZ_CLEAR_OHE2);
@@ -612,7 +742,7 @@ public class J21 {
 			System.out.println("Overhead electric voltage details not specified.");// TODO:
 																					// CHECK
 																					// MANDATORY
-	}
+	*/}
 
 	private static void getBlocks(DXFDocument doc) {
 		int block = 0;
