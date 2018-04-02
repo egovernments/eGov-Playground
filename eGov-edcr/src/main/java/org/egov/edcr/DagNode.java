@@ -14,7 +14,7 @@ public class DagNode {
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
-		return super.toString();
+		return this.value;
 	}
 
 	private List<DagNode> parents;
@@ -64,12 +64,23 @@ public class DagNode {
 
 	public void addChild(DagNode childNode) {
 
+		//childNode.addParent(this);
 		if (children == null) {
 			children = new ArrayList<>();
 			children.add(childNode);
 		} else {
 			children.add(childNode);
 		}
+		if (childNode.parents == null) {
+			childNode.parents = new ArrayList<>();
+			childNode.parents.add(this);
+		}else
+		{
+			childNode.parents.add(this);
+		}
+		
+		
+		
 
 	}
 
@@ -95,7 +106,7 @@ public class DagNode {
 			System.out.println(s + "-->" + node.value);
          else
         	 System.out.println( node.value);
-
+         
 			return s;
 		} else {
 
@@ -103,7 +114,15 @@ public class DagNode {
 		}
 
 		for (DagNode child : node.getChildren()) {
+			
 			s = print(child, s, node, root);
+			if(child.getChildren()==null)
+			{
+				if(node.getChildren().size()==1)
+				{
+					s=s.substring(0,s.length()-4);
+				}
+			}
 		}
 
 		return s;

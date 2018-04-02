@@ -23,13 +23,14 @@ public class DagGraph {
 				// child.getParents().add(node);
 				if (nodes.isEmpty()) {
 
-					node.addChild(split[1]);
+					node.addChild(child);
+					//child.addParent(node);
 					nodes.add(node);
 				} else {
 
 					DagNode result = lookUpNode(nodes, node);
 					if (result != null) {
-						result.addChild(split[1]);
+						result.addChild(child);
 
 					} else if (result == null) {
 
@@ -39,7 +40,7 @@ public class DagGraph {
 							nodes.add(node);
 						}
 						if (result == null) {
-							node.addChild(split[1]);
+							node.addChild(child);
 							nodes.add(node);
 						}
 					}
